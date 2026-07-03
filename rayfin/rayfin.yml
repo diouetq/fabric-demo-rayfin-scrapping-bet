@@ -1,0 +1,31 @@
+id: scrapping-bet
+name: Scrapping_Bet
+version: 1.0.0
+connectors:
+  scrapping-bet:
+    connector: fabric-sql
+    config:
+      workspaceId: 41d4b6d3-34d9-41d3-a051-9f91192cc26a
+      itemId: 4423190a-684f-4cf0-91bc-89fe9fabeb67
+services:
+  auth:
+    enabled: true
+    fabric:
+      enabled: true
+    allowedRedirectUris:
+      - http://localhost:5173
+      - https://elite-palm-674faace13-francecentral.webapp.fabricapps.net
+      - https://icy-quail-0ba8616c1a-francecentral.webapp.fabricapps.net
+      - https://able-blaze-ac50af5c6e-francecentral.webapp.fabricapps.net
+  data:
+    enabled: true
+    dialect: mssql
+  storage:
+    enabled: false
+  staticHosting:
+    enabled: true
+    folder: dist
+    buildCommand: npm run build:fabric
+    indexDocument: index.html
+  functions:
+    enabled: true

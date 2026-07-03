@@ -1,0 +1,81 @@
+{
+  "runtime": "TypeScript",
+  "functionsMetadata": [
+    {
+      "name": "uploadParisImport",
+      "scriptFile": "src\\function_app.ts",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "httpTrigger",
+          "direction": "in",
+          "authLevel": "anonymous",
+          "methods": [
+            "post"
+          ],
+          "route": "uploadParisImport"
+        },
+        {
+          "name": "$return",
+          "type": "http",
+          "direction": "out"
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.0",
+        "fabricFunctionReturnType": "Promise<{ url: string; bytesUploaded: number }>",
+        "fabricFunctionParameters": [
+          {
+            "name": "fileName",
+            "dataType": "string",
+            "hasDefaultValue": false
+          },
+          {
+            "name": "contentBase64",
+            "dataType": "string",
+            "hasDefaultValue": false
+          },
+          {
+            "name": "ctx",
+            "dataType": "RayfinContext",
+            "hasDefaultValue": false
+          }
+        ]
+      },
+      "functionCode": "udf.func('uploadParisImport', async (\r\n  fileName: string,\r\n  contentBase64: string,\r\n  ctx: RayfinContext,\r\n): Promise<{ url: string; bytesUploaded: number }> => {\r\n  ctx.log.info(`uploadParisImport: ${fileName}`);\r\n  const data = Buffer.from(contentBase64, 'base64');\r\n  return uploadBytesToOneLake(fileName, data);\r\n}, [])"
+    },
+    {
+      "name": "listImportPipelineJobs",
+      "scriptFile": "src\\function_app.ts",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "httpTrigger",
+          "direction": "in",
+          "authLevel": "anonymous",
+          "methods": [
+            "post"
+          ],
+          "route": "listImportPipelineJobs"
+        },
+        {
+          "name": "$return",
+          "type": "http",
+          "direction": "out"
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.0",
+        "fabricFunctionReturnType": "Promise<Array<{ id: string; status: string; startTime?: string; endTime?: string; failureReason?: string }>>",
+        "fabricFunctionParameters": [
+          {
+            "name": "ctx",
+            "dataType": "RayfinContext",
+            "hasDefaultValue": false
+          }
+        ]
+      },
+      "functionCode": "udf.func('listImportPipelineJobs', async (\r\n  ctx: RayfinContext,\r\n): Promise<Array<{ id: string; status: string; startTime?: string; endTime?: string; failureReason?: string }>> => {\r\n  ctx.log.info('listImportPipelineJobs');\r\n  return listPipelineJobInstances();\r\n}, [])"
+    }
+  ]
+}

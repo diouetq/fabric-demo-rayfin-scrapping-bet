@@ -1,0 +1,34 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-backup*/
+*.tgz
+
+# Added by Rayfin CLI
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+dist-ssr
+*.tsbuildinfo
+.vite
+coverage
+*.local
+rayfin/.env*
+rayfin/.deployments.json
+rayfin/functions/local.settings.json
+rayfin/.temp/
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

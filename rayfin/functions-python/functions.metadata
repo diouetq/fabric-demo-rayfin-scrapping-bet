@@ -1,0 +1,201 @@
+[
+  {
+    "name": "scrapeGreenluck",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "scrapeGreenluck",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "sportIds", "dataType": "array" }
+      ]
+    }
+  },
+  {
+    "name": "fetchGreenluckJson",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "fetchGreenluckJson",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "path", "dataType": "string" }
+      ]
+    }
+  },
+  {
+    "name": "scrapeSlott",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "scrapeSlott",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "regionIds", "dataType": "array" }
+      ]
+    }
+  },
+  {
+    "name": "fetchSlottBetline",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "fetchSlottBetline",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "regionId", "dataType": "string" }
+      ]
+    }
+  },
+  {
+    "name": "fetchPinnacleMatchups",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "fetchPinnacleMatchups",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "sportId", "dataType": "string" }
+      ]
+    }
+  },
+  {
+    "name": "listDimensions",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "listDimensions",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "dict",
+      "fabricFunctionParameters": []
+    }
+  },
+  {
+    "name": "listFaitParis",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "listFaitParis",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "string",
+      "fabricFunctionParameters": [
+        { "name": "limit", "dataType": "int" }
+      ]
+    }
+  },
+  {
+    "name": "createFaitPari",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "createFaitPari",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "dict",
+      "fabricFunctionParameters": [
+        { "name": "input", "dataType": "dict" }
+      ]
+    }
+  },
+  {
+    "name": "updateFaitPari",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "updateFaitPari",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "dict",
+      "fabricFunctionParameters": [
+        { "name": "id_pari", "dataType": "int" },
+        { "name": "patch", "dataType": "dict" }
+      ]
+    }
+  },
+  {
+    "name": "deleteFaitPari",
+    "scriptFile": "function_app.py",
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "methods": ["post"],
+        "route": "deleteFaitPari",
+        "authLevel": "Anonymous"
+      }
+    ],
+    "fabricProperties": {
+      "fabricFunctionReturnType": "dict",
+      "fabricFunctionParameters": [
+        { "name": "id_pari", "dataType": "int" }
+      ]
+    }
+  }
+]
