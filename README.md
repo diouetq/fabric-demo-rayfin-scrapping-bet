@@ -2,21 +2,41 @@
 
 > Fabric App développée avec [Rayfin](https://github.com/microsoft/rayfin) — projet vitrine testant la construction d'une application data complète (ingestion, modélisation, calculs métier, restitution) sur Microsoft Fabric, par un profil analytics (Power BI) plutôt que développement.
 
+## Aperçu
+
+L'app est derrière une authentification Fabric sur invitation (voir [Comment y accéder](#comment-y-accéder)) — voici à quoi elle ressemble :
+
+**Écran de connexion**
+![Écran de connexion](docs/screenshots/ecran-connexion.png)
+
+**Cotes en direct** — bookmakers actifs, compétitions à venir, meilleurs TRJ
+![Cotes en direct — panneaux](docs/screenshots/cotes-en-direct-panels.png)
+
+**Cotes en direct** — détail par groupe, avec TRJ/Kelly/surebet calculés
+![Cotes en direct — tableau](docs/screenshots/cotes-en-direct-tableau.png)
+
+**Mes paris** — historique complet, saisie manuelle ou depuis une cote collectée
+![Mes paris](docs/screenshots/mes-paris.png)
+
+**KPI** — ROI, bankroll, profit cumulé
+![KPI](docs/screenshots/kpi-dashboard.png)
+
 ## Sommaire
 
-1. [Contexte](#contexte)
-2. [Architecture](#architecture)
-3. [Modèle de données](#modèle-de-données)
-4. [Logique métier / formules](#logique-métier--formules)
-5. [Pipeline de données](#pipeline-de-données)
-6. [Sécurité et accès](#sécurité-et-accès)
-7. [Stack technique](#stack-technique)
-8. [Tests](#tests)
-9. [Démarrage local](#démarrage-local)
-10. [Scripts](#scripts)
-11. [Structure du projet](#structure-du-projet)
-12. [Limites actuelles et roadmap](#limites-actuelles-et-roadmap)
-13. [Glossaire](#glossaire)
+1. [Aperçu](#aperçu)
+2. [Contexte](#contexte)
+3. [Architecture](#architecture)
+4. [Modèle de données](#modèle-de-données)
+5. [Logique métier / formules](#logique-métier--formules)
+6. [Pipeline de données](#pipeline-de-données)
+7. [Sécurité et accès](#sécurité-et-accès)
+8. [Stack technique](#stack-technique)
+9. [Tests](#tests)
+10. [Démarrage local](#démarrage-local)
+11. [Scripts](#scripts)
+12. [Structure du projet](#structure-du-projet)
+13. [Limites actuelles et roadmap](#limites-actuelles-et-roadmap)
+14. [Glossaire](#glossaire)
 
 ## Contexte
 
@@ -145,6 +165,15 @@ Surebet       = TRJ_marché > 1
 
 ## Sécurité et accès
 
+### Comment y accéder
+
+C'est une démo hébergée sur un workspace Microsoft Fabric privé — accès sur invitation :
+
+1. Écrivez à **diouet.pro@gmail.com** avec votre adresse (idéalement un compte Microsoft/Entra) — l'écran de connexion propose un bouton qui pré-remplit ce mail.
+2. Vous êtes ajouté(e) au workspace Fabric du projet.
+3. Vous recevez une invitation Fabric par email — à accepter.
+4. Connectez-vous ensuite via le bouton « Se connecter » de l'app.
+
 - **Authentification** : Fabric SSO (`@microsoft/rayfin-auth-provider-fabric`), accès sur invitation au workspace Fabric (voir écran de connexion de l'app).
 - **Autorisations GraphQL** (Data API Builder, `scripts/dab-scrapping-bet-config.mjs`), par entité et par rôle `authenticated` :
 
@@ -212,6 +241,7 @@ rayfin/
   functions/    Azure Function TypeScript (import de paris)
   functions-python/  Azure Function Python (scrapeAndStoreSlott)
 scripts/        config DAB, diagnostic, déploiement
+docs/           captures d'écran et post de présentation (LinkedIn)
 ```
 
 ## Limites actuelles et roadmap
