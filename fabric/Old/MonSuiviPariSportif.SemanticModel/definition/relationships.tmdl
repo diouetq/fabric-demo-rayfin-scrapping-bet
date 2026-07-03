@@ -1,0 +1,30 @@
+relationship 9cb355fd-76ff-4aa7-9fbc-73aaaab2eb9f
+	fromColumn: Fact_BDD.Boost
+	toColumn: Dim_TypeBet.Boost
+
+relationship 9a9ecd63-fb80-fee4-ea63-742315820e00
+	fromColumn: Fact_BDD.Bookmaker
+	toColumn: Dim_Bookmaker.Bookmaker
+
+relationship a9b8876e-a254-fae9-3ba8-aa48f18ea5e5
+	fromColumn: Fact_BDD.Sport
+	toColumn: Dim_Sport.Sport
+
+relationship 2a8b31f1-9545-4bae-ad9f-16ecbfe68313
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Date.Date
+	toColumn: LocalDateTable_b64014b5-a3c6-4faf-994e-2c73b79204b6.Date
+
+relationship 6f9b94b3-fc43-60b5-997a-77d023ff855b
+	fromColumn: Fact_BDD.Date
+	toColumn: Dim_Date.Date
+
+relationship bd852b26-2054-2d11-d901-b044efffcc21
+	fromColumn: Fact_BDD.Cote
+	toColumn: Dim_Odds.Odds
+
+relationship d1a6533b-6ecf-4a24-8437-cf43b125a12c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LastRefresh.DerniereActualisation
+	toColumn: LocalDateTable_48a4f6ff-05b8-4b9c-9d23-70fd65e46ca7.Date
+

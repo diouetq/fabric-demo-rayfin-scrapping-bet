@@ -1,0 +1,72 @@
+table LastRefresh
+	isHidden
+	lineageTag: 17723f7f-a60b-4054-8f53-73d232413f51
+
+	column DerniereActualisation
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 389cd836-98a8-4ed9-b2d6-6e6d8ba5ca61
+		summarizeBy: none
+		sourceColumn: DerniereActualisation
+
+		variation Variation
+			isDefault
+			relationship: d1a6533b-6ecf-4a24-8437-cf43b125a12c
+			defaultHierarchy: LocalDateTable_48a4f6ff-05b8-4b9c-9d23-70fd65e46ca7.'Hiérarchie de dates'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition LastRefresh = m
+		mode: import
+		source =
+				let
+				    Source =
+				        #table(
+				            {"DerniereActualisation"},
+				            { { DateTimeZone.UtcNow() } }
+				        ),
+				
+				    HeureParis =
+				        Table.TransformColumns(
+				            Source,
+				            {
+				                {
+				                    "DerniereActualisation",
+				                    (dt) =>
+				                        DateTimeZone.SwitchZone(
+				                            dt,
+				                            if
+				                                Date.Month(dt) > 3 and Date.Month(dt) < 10
+				                            then
+				                                2
+				                            else
+				                                1
+				                        ),
+				                    type datetimezone
+				                }
+				            }
+				        ),
+				
+				    HeureParisFinale =
+				        Table.TransformColumns(
+				            HeureParis,
+				            {
+				                {
+				                    "DerniereActualisation",
+				                    DateTimeZone.RemoveZone,
+				                    type datetime
+				                }
+				            }
+				        )
+				in
+				    HeureParisFinale
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

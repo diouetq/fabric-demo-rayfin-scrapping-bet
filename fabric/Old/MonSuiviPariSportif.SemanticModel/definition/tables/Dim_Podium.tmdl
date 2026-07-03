@@ -1,0 +1,73 @@
+table Dim_Podium
+	lineageTag: e9949da9-f60f-49be-b003-e23ab846aea8
+
+	column Rang
+		formatString: 0
+		lineageTag: 707e838b-545b-456b-aa72-50f830f686fe
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Rang]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Libellé
+		lineageTag: c6e0e322-0e7d-4efe-83c5-143c76022dae
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Libellé]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Couleur
+		lineageTag: 29722600-cdc6-4642-a5a2-611f021580f0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Couleur]
+
+		annotation SummarizationSetBy = Automatic
+
+	column SVG_Picto
+		lineageTag: d27d1d22-ab0b-45ca-9af4-1847e91258cb
+		dataCategory: ImageUrl
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SVG_Picto]
+		sortByColumn: Rang
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Podium = calculated
+		mode: import
+		source = ```
+				
+				
+				DATATABLE (
+				    "Rang", INTEGER,
+				    "Libellé", STRING,
+				    "Couleur", STRING,
+				    "SVG_Picto", STRING,
+				    {
+				        {
+				            1, 
+				            "1er", 
+				            "#FFD700", 
+				            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='2' width='20' height='20' rx='6' fill='#FFD700' fill-opacity='0.15' transform='rotate(-10 12 12)' /><text x='12' y='13' text-anchor='middle' dominant-baseline='middle' style='font-family:Segoe UI, Arial; font-weight:bold; font-size:12px;' fill='#FFD700'>1</text></svg>"
+				        },
+				        {
+				            2, 
+				            "2ème", 
+				            "#B0B0B0", 
+				            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='2' width='20' height='20' rx='6' fill='#B0B0B0' fill-opacity='0.15' transform='rotate(-10 12 12)' /><text x='12' y='13' text-anchor='middle' dominant-baseline='middle' style='font-family:Segoe UI, Arial; font-weight:bold; font-size:12px;' fill='#B0B0B0'>2</text></svg>"
+				        },
+				        {
+				            3, 
+				            "3ème", 
+				            "#CD7F32", 
+				            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2' y='2' width='20' height='20' rx='6' fill='#CD7F32' fill-opacity='0.15' transform='rotate(-10 12 12)' /><text x='12' y='13' text-anchor='middle' dominant-baseline='middle' style='font-family:Segoe UI, Arial; font-weight:bold; font-size:12px;' fill='#CD7F32'>3</text></svg>"
+				        }
+				    }
+				)
+				```
+
+	annotation PBI_Id = 89f5946821744d53960e3b84a4a414b7
+

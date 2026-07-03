@@ -1,0 +1,39 @@
+{
+  "formatVersion": "202502",
+  "computeEngineSettings": {
+    "allowModernEvaluationEngine": true
+  },
+  "name": "Dataflow_ImportParis",
+  "queryGroups": [],
+  "documentLocale": "fr-FR",
+  "queriesMetadata": {
+    "MonSuiviPariSportif xlsx": {
+      "queryId": "2076e4a2-fe9a-4f47-9307-4b5b3ff5e58c",
+      "queryName": "MonSuiviPariSportif xlsx",
+      "loadEnabled": false
+    },
+    "MonSuiviPariSportif xlsx_DataDestination": {
+      "queryId": "41448353-794e-495f-8a95-33649716b366",
+      "queryName": "MonSuiviPariSportif xlsx_DataDestination",
+      "isHidden": true,
+      "loadEnabled": false
+    }
+  },
+  "connections": [
+    {
+      "path": "Lakehouse",
+      "kind": "Lakehouse",
+      "connectionId": "{\"ClusterId\":\"6222284f-726d-4907-8847-cd9f2bdd4741\",\"DatasourceId\":\"d0414fe6-b2be-47ed-a75a-a5a97f92cc49\"}"
+    },
+    {
+      "path": "zf3afmdpfp5elpdba6qczp3eny-2o3niqozgtjudicrt6irslgcni.database.fabric.microsoft.com;scrapping-bet-4423190a-684f-4cf0-91bc-89fe9fabeb67",
+      "kind": "SQL",
+      "connectionId": "{\"ClusterId\":\"6222284f-726d-4907-8847-cd9f2bdd4741\",\"DatasourceId\":\"5f4c58b6-1dd9-4b9a-8540-8e1260ffd4f3\"}"
+    },
+    {
+      "path": "FabricSql",
+      "kind": "FabricSql",
+      "connectionId": "{\"ClusterId\":\"6222284f-726d-4907-8847-cd9f2bdd4741\",\"DatasourceId\":\"2629fb29-9d55-49f1-a0ef-ac470740e7b7\"}"
+    }
+  ]
+}

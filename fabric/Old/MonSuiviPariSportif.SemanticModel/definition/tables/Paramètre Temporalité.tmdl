@@ -1,0 +1,51 @@
+table 'Paramètre Temporalité'
+	lineageTag: aafd83e5-44e4-4367-807c-9219e044f274
+
+	column Paramètre
+		lineageTag: 22fccb6b-c543-4619-96a5-9486d8604cfa
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Paramètre Commande'
+
+		relatedColumnDetails
+			groupByColumn: 'Paramètre Champs'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Paramètre Champs'
+		isHidden
+		lineageTag: cf1215f3-b42c-4451-b792-adb4ebd0ab80
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Paramètre Commande'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Paramètre Commande'
+		isHidden
+		formatString: 0
+		lineageTag: 12da1557-becb-4685-9532-aa7eaec03c60
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Paramètre Temporalité' = calculated
+		mode: import
+		source =
+				{
+				    ("J", NAMEOF('Dim_Date'[Date]), 0),
+				    ("S", NAMEOF('Dim_Date'[Semaine Année]), 1),
+				    ("M", NAMEOF('Dim_Date'[Mois Année]), 2),
+				    ("T", NAMEOF('Dim_Date'[Trimestre Année]), 3),
+				    ("A", NAMEOF('Dim_Date'[Année]), 4)
+				}
+
+	annotation PBI_Id = 63d084c59a374f1d9e7131f5b1936343
+

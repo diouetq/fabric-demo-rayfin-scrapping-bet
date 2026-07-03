@@ -1,0 +1,32 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling","TMDLView_Desktop"]
+
+annotation PBI_QueryOrder = ["CheminFichier","Fact_BDD","Dim_Bookmaker","Dim_Sport","Dim_TypeBet","LastRefresh"]
+
+ref table Fact_BDD
+ref table Mesure
+ref table Dim_Bookmaker
+ref table Dim_Sport
+ref table Dim_TypeBet
+ref table Dim_Odds
+ref table 'Paramètre Temporalité'
+ref table Dim_Date
+ref table DateTableTemplate_5c38a29a-d868-4305-aadc-f4f01af20e04
+ref table LocalDateTable_b64014b5-a3c6-4faf-994e-2c73b79204b6
+ref table Dim_Podium
+ref table Dim_KPI
+ref table 'Paramètre Champ'
+ref table LastRefresh
+ref table LocalDateTable_48a4f6ff-05b8-4b9c-9d23-70fd65e46ca7
+
+ref cultureInfo fr-FR
+

@@ -1,0 +1,86 @@
+table Dim_Odds
+	lineageTag: 9b643b2b-94bf-4910-b238-987df00d9fce
+
+	/// Retourne la valeur de cote sélectionnée dans le contexte actuel.
+	measure 'Valeur Cotes' = SELECTEDVALUE('Dim_Odds'[Odds])
+		lineageTag: 2c56fdfe-237b-4796-8fff-f0aefcbe0235
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Odds
+		dataType: decimal
+		formatString: 0.00
+		lineageTag: 0a4cc62a-d3a7-4d4c-ab26-c67a983a9814
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	column Cote
+		lineageTag: 015c7f2e-68dd-4958-a576-da1a8e0da2f2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Cote]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Catégorie
+		lineageTag: 564e78fe-f3bc-49b7-81dd-2779564db918
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Catégorie]
+		sortByColumn: 'Ordre Tri'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ordre Tri'
+		formatString: 0
+		lineageTag: 30032947-6495-4e39-bbb5-eabb77ea595d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Ordre Tri]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Odds = calculated
+		mode: import
+		source = ```
+				
+				
+				ADDCOLUMNS(
+				    GENERATESERIES(1, 40, 0.01),
+				    "Cote", [Value],
+				    "Catégorie", 
+				        SWITCH( TRUE(),
+				            [Value] < 1.50, "[1.00 - 1.50[",
+				            [Value] < 1.75, "[1.50 - 1.75[",
+				            [Value] < 2.00, "[1.75 - 2.00[",
+				            [Value] < 2.25, "[2.00 - 2.25[",
+				            [Value] < 2.50, "[2.25 - 2.50[",
+				            [Value] < 3.00, "[2.50 - 3.00[",
+				            [Value] < 5.00, "[3.00 - 5.00[",
+				            "[5.00 - 50.00]"
+				        ),
+				    "Ordre Tri",
+				        SWITCH( TRUE(),
+				            [Value] < 1.50, 1,
+				            [Value] < 1.75, 2,
+				            [Value] < 2.00, 3,
+				            [Value] < 2.25, 4,
+				            [Value] < 2.50, 5,
+				            [Value] < 3.00, 6,
+				            [Value] < 5.00, 7,
+				            8
+				        )
+				)
+				```
+
+	annotation PBI_Id = 51d27d6d97ec487f83434b4c6989adca
+

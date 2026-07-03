@@ -1,0 +1,35 @@
+table Dim_Sport
+	lineageTag: b2ec8829-6d51-45c1-af68-d1c73a794f1b
+
+	column Sport
+		dataType: string
+		lineageTag: dc4de10a-bb4f-4cf2-aa9f-ee4faf6bef45
+		summarizeBy: none
+		sourceColumn: Sport
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type_Sport
+		dataType: string
+		lineageTag: e061f063-1861-4f30-9b6c-f13fd152504c
+		summarizeBy: none
+		sourceColumn: Type_Sport
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Sport = m
+		mode: import
+		source =
+				let
+				
+				    Source = Excel.Workbook(File.Contents(CheminFichier), null, true),
+				    BDD_Sheet = Source{[Item="Liste",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(BDD_Sheet, [PromoteAllScalars=true]),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Promoted Headers",{"Sport", "Type_Sport"})
+				in
+				    #"Removed Other Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

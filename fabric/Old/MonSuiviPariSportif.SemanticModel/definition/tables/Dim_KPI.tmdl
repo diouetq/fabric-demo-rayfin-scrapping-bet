@@ -1,0 +1,63 @@
+table Dim_KPI
+	lineageTag: 07d04c83-bffb-4fb3-af87-4bc1c85037f0
+
+	column Nom_KPI
+		lineageTag: e6d9a167-1ce8-4035-b456-00c44e942692
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Nom_KPI]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Tri
+		formatString: 0
+		lineageTag: 41903503-2063-4054-9c3f-f28f10ef813b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [ID_Tri]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Label_SVG
+		lineageTag: e7c9ba81-5137-4dc6-bd79-81ce739b55ed
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Label_SVG]
+		sortByColumn: ID_Tri
+
+		annotation SummarizationSetBy = Automatic
+
+	column Format_KPI
+		lineageTag: 36623c33-f02a-45a2-a89e-7f034c48e7c0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Format_KPI]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_KPI = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE (
+				    "Nom_KPI", STRING, 
+				    "ID_Tri", INTEGER, 
+				    "Label_SVG", STRING,
+				    "Format_KPI", STRING,
+				    {
+				        {"KPI_(Paris)", 0, "Nombre de Paris", "#,##0"},
+				        {"KPI_(Taux Reussite %)", 1, "Taux de Réussite", "0.0 %"},
+				        {"KPI_(ROI)", 2, "ROI %", "0.0 %"},
+				        {"KPI_(Profits)", 3, "Profits", "#,##0 €"},
+				        {"KPI_(Mise Totale)", 4, "Mise Totale", "#,##0 €"},
+				        {"KPI_(Gain Total)", 5, "Gain Total", "#,##0 €"},
+				        {"KPI_(Cote Moyenne)", 6, "Cote Moyenne", "0.00"},
+				        {"KPI_(Cote Moyenne Gagné)", 7, "Cote Moy. Gagnée", "0.00"},
+				        {"KPI_(Cote Moyenne Perdu)", 8, "Cote Moy. Perdue", "0.00"},
+				        {"KPI_(Paris % Classique)", 9, "Paris Classiques %", "0.0 %"}
+				    }
+				)
+				```
+
+	annotation PBI_Id = 09980fec8308433c9d4ab7862b3a663c
+

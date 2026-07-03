@@ -1,0 +1,67 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "48da5c6e892a5a910002",
+  "position": {
+    "x": 354.03572429458529,
+    "y": 134.12274879419445,
+    "z": 12000,
+    "height": 50.7491481923979,
+    "width": 902.60984999336256,
+    "tabOrder": 11000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Mesure"
+                    }
+                  },
+                  "Property": "_HTML_(FILTRES SELECTIONNES)"
+                }
+              },
+              "queryRef": "Mesure.HTML FILTRES SELECTIONNES",
+              "nativeQueryRef": "HTML FILTRES SELECTIONNES"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'HTML_Filters_Selected'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "parentGroupName": "30c9e810713c4062ddc2"
+}

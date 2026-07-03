@@ -1,0 +1,133 @@
+table Fact_BDD
+	lineageTag: 216dbb31-59a7-489d-8763-1a938e80f69b
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 460b0ac8-4c5b-4ddb-b4fb-99e5c27e0463
+		summarizeBy: none
+		sourceColumn: Date
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Bookmaker
+		dataType: string
+		lineageTag: 4af103b7-de8b-4380-9da4-7a26ffeba477
+		summarizeBy: none
+		sourceColumn: Bookmaker
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sport
+		dataType: string
+		lineageTag: 4fa3fa85-0fba-4a7b-9ff4-1ada8442b130
+		summarizeBy: none
+		sourceColumn: Sport
+
+		annotation SummarizationSetBy = Automatic
+
+	column Compétition
+		dataType: string
+		lineageTag: a0c7b714-dd05-48c4-9fc3-d28ac8131aa0
+		summarizeBy: none
+		sourceColumn: Compétition
+
+		annotation SummarizationSetBy = Automatic
+
+	column Événement
+		dataType: string
+		lineageTag: 85d61d79-2feb-4ad3-9cd6-24f942cf3e47
+		summarizeBy: none
+		sourceColumn: Événement
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Type de pari'
+		dataType: string
+		lineageTag: 6e4865f5-b9c8-4510-8b65-abcd67d871bb
+		summarizeBy: none
+		sourceColumn: Type de pari
+
+		annotation SummarizationSetBy = Automatic
+
+	column Boost
+		dataType: string
+		lineageTag: cd5b084d-49ef-414a-adc3-c4fd8b5637ca
+		summarizeBy: none
+		sourceColumn: Boost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cote
+		dataType: decimal
+		formatString: 0.00
+		lineageTag: 7ba34b28-9770-4629-8e3b-f9f60303316d
+		summarizeBy: none
+		sourceColumn: Cote
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mise
+		dataType: double
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: 31831676-ccd2-4193-b5eb-2dcb87d9a376
+		summarizeBy: sum
+		sourceColumn: Mise
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Résultat
+		dataType: string
+		lineageTag: 8ab72bcc-8b60-41ba-abc2-eca05449f4b7
+		summarizeBy: none
+		sourceColumn: Résultat
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gain
+		dataType: double
+		formatString: #,0.00\ "€";-#,0.00\ "€";#,0.00\ "€"
+		lineageTag: f3975a26-8786-4237-96fd-3ed223c0b0f8
+		summarizeBy: none
+		sourceColumn: Gain
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
+
+	column Index
+		dataType: int64
+		formatString: 0
+		lineageTag: 52fff443-403a-4606-bb95-15f22f97fabb
+		summarizeBy: sum
+		sourceColumn: Index
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_BDD = m
+		mode: import
+		source =
+				let
+				
+				    Source = Excel.Workbook(File.Contents(CheminFichier), null, true),
+				    BDD_Sheet = Source{[Item="BDD",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(BDD_Sheet, [PromoteAllScalars=true]),
+				    #"Replaced Value" = Table.ReplaceValue(#"Promoted Headers","",null,Replacer.ReplaceValue,{"Gain"}),
+				    #"Added Index" = Table.AddIndexColumn(#"Replaced Value", "Index", 1, 1, Int64.Type),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Added Index",{"Index", "Date", "Bookmaker", "Sport", "Compétition", "Événement", "Type de pari", "Boost", "Cote", "Mise", "Résultat", "Gain"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Reordered Columns", each ([Résultat] <> null))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

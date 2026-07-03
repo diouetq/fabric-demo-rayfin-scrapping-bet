@@ -1,0 +1,125 @@
+{
+  "runtime": "PYTHON",
+  "functionsMetadata": [
+    {
+      "name": "fetchSlottBetline",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "str",
+        "fabricFunctionParameters": [
+          {
+            "name": "sportId",
+            "dataType": "str",
+            "hasDefaultValue": false,
+            "defaultValue": null
+          }
+        ]
+      },
+      "functionCode": "@udf.function()\ndef fetchSlottBetline(sportId: str) -\u003E str:\n    logging.info(\u0022fetchSlottBetline sportId=%s\u0022, sportId)\n    return json.dumps(_fetch_slott_events(str(sportId)))"
+    },
+    {
+      "name": "scrapeSlott",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "str",
+        "fabricFunctionParameters": [
+          {
+            "name": "sportIds",
+            "dataType": "str",
+            "hasDefaultValue": false,
+            "defaultValue": null
+          }
+        ]
+      },
+      "functionCode": "@udf.function()\ndef scrapeSlott(sportIds: str) -\u003E str:\n    logging.info(\u0022scrapeSlott sportIds=%s\u0022, sportIds)\n    try:\n        ids = json.loads(sportIds) if sportIds else []\n    except (json.JSONDecodeError, TypeError):\n        ids = [sportIds] if sportIds else []\n    ids = [str(x) for x in ids] if isinstance(ids, list) else [str(ids)]\n    paris_tz = datetime.timezone(datetime.timedelta(hours=1))\n    extraction = datetime.datetime.now(paris_tz)\n    all_rows = []\n    for sportId in ids:\n        try:\n            all_rows.extend(_scrape_slott_sport(sportId, extraction, paris_tz))\n        except urllib.error.HTTPError as exc:\n            logging.warning(\u0022scrapeSlott sport %s HTTP %s\u0022, sportId, exc.code)\n        except urllib.error.URLError as exc:\n            logging.warning(\u0022scrapeSlott sport %s network %s\u0022, sportId, exc.reason)\n    logging.info(\u0022scrapeSlott rows=%s\u0022, len(all_rows))\n    return json.dumps(all_rows)"
+    },
+    {
+      "name": "scrapeAndStoreSlott",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        },
+        {
+          "name": "sqlDB",
+          "type": "FabricItem",
+          "direction": "In",
+          "alias": "scrappingbet",
+          "subType": "FabricSqlConnection",
+          "itemType": null,
+          "audienceType": null
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "str",
+        "fabricFunctionParameters": []
+      },
+      "functionCode": "@udf.connection(argName=\u0022sqlDB\u0022, alias=\u0022scrappingbet\u0022)\n@udf.function()\ndef scrapeAndStoreSlott(sqlDB: fn.FabricSqlConnection) -\u003E str:\n    paris_tz = datetime.timezone(datetime.timedelta(hours=1))\n    extraction = datetime.datetime.now(paris_tz)\n\n    connection = sqlDB.connect()\n    cursor = connection.cursor()\n    try:\n        cursor.execute(\n            \u0022SELECT api_id FROM dbo.dim_sport_ids_API WHERE bookmaker = \u0027slott\u0027 AND actif = 1\u0022\n        )\n        sport_ids = [str(row[0]) for row in cursor.fetchall()]\n\n    finally:\n        cursor.close()\n        connection.close()\n\n    logging.info(\u0022scrapeAndStoreSlott sport_ids=%s\u0022, sport_ids)\n\n    all_rows = []\n    for sportId in sport_ids:\n        try:\n            all_rows.extend(_scrape_slott_sport(sportId, extraction, paris_tz))\n        except urllib.error.HTTPError as exc:\n            logging.warning(\u0022scrapeAndStoreSlott sport %s HTTP %s\u0022, sportId, exc.code)\n        except urllib.error.URLError as exc:\n            logging.warning(\u0022scrapeAndStoreSlott sport %s network %s\u0022, sportId, exc.reason)\n\n    logging.info(\u0022scrapeAndStoreSlott scraped %d rows\u0022, len(all_rows))\n\n    connection = sqlDB.connect()\n    cursor = connection.cursor()\n    try:\n        cursor.execute(\u0022DELETE FROM dbo.slott_cotes\u0022)\n\n        insert_sql = (\n            \u0022INSERT INTO dbo.slott_cotes (api_id, competition, evenement, competiteur, cote, cutoff, extraction) \u0022\n            \u0022VALUES (?, ?, ?, ?, ?, ?, ?)\u0022\n        )\n        for row in all_rows:\n            cursor.execute(\n                insert_sql,\n                (\n                    row[\u0022api_id\u0022],\n                    row[\u0022competition\u0022],\n                    row[\u0022evenement\u0022],\n                    row[\u0022competiteur\u0022],\n                    row[\u0022cote\u0022],\n                    row[\u0022cutoff\u0022],\n                    row[\u0022extraction\u0022],\n                ),\n            )\n\n        cursor.execute(\n            \u0022UPDATE dbo.slott_jobs SET status=\u0027done\u0027, completed_at=GETUTCDATE(), row_count=? WHERE id=1\u0022,\n            (len(all_rows),),\n        )\n\n        connection.commit()\n        logging.info(\u0022scrapeAndStoreSlott stored %d rows\u0022, len(all_rows))\n        return json.dumps({\u0022status\u0022: \u0022done\u0022, \u0022count\u0022: len(all_rows)})\n\n    except Exception as exc:\n        connection.rollback()\n        logging.error(\u0022scrapeAndStoreSlott DB error: %s\u0022, exc)\n        try:\n            cursor.execute(\n                \u0022UPDATE dbo.slott_jobs SET status=\u0027error\u0027, error_msg=?, completed_at=GETUTCDATE() WHERE id=1\u0022,\n                (str(exc)[:500],),\n            )\n            connection.commit()\n        except Exception:\n            pass\n        raise\n    finally:\n        cursor.close()\n        connection.close()"
+    },
+    {
+      "name": "getSlottJobStatus",
+      "scriptFile": "function_app.py",
+      "bindings": [
+        {
+          "name": "req",
+          "type": "HttpTrigger",
+          "direction": "In",
+          "authLevel": "Anonymous",
+          "methods": [
+            "POST"
+          ],
+          "route": ""
+        },
+        {
+          "name": "sqlDB",
+          "type": "FabricItem",
+          "direction": "In",
+          "alias": "scrappingbet",
+          "subType": "FabricSqlConnection",
+          "itemType": null,
+          "audienceType": null
+        }
+      ],
+      "fabricProperties": {
+        "fabricMetadataSchemaVersion": "1.1.0",
+        "fabricFunctionReturnType": "str",
+        "fabricFunctionParameters": []
+      },
+      "functionCode": "@udf.connection(argName=\u0022sqlDB\u0022, alias=\u0022scrappingbet\u0022)\n@udf.function()\ndef getSlottJobStatus(sqlDB: fn.FabricSqlConnection) -\u003E str:\n    connection = sqlDB.connect()\n    cursor = connection.cursor()\n    try:\n        cursor.execute(\n            \u0022SELECT status, requested_at, completed_at, row_count, error_msg \u0022\n            \u0022FROM dbo.slott_jobs WHERE id=1\u0022\n        )\n        row = cursor.fetchone()\n        if row is None:\n            return json.dumps({\u0022status\u0022: \u0022idle\u0022})\n        return json.dumps({\n            \u0022status\u0022: row[0],\n            \u0022requestedAt\u0022: row[1].isoformat() if row[1] else None,\n            \u0022completedAt\u0022: row[2].isoformat() if row[2] else None,\n            \u0022rowCount\u0022: row[3],\n            \u0022errorMsg\u0022: row[4],\n        })\n    finally:\n        cursor.close()\n        connection.close()"
+    }
+  ]
+}

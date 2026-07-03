@@ -1,0 +1,211 @@
+table Dim_Date
+	lineageTag: 9dcb6edc-d373-4245-99dc-e2add27c5e82
+
+	column Date
+		formatString: Short Date
+		lineageTag: f7453d18-e1b8-4b84-90c3-b419cef86aaa
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 2a8b31f1-9545-4bae-ad9f-16ecbfe68313
+			defaultHierarchy: LocalDateTable_b64014b5-a3c6-4faf-994e-2c73b79204b6.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Année
+		formatString: 0
+		lineageTag: b6a980eb-ea3f-49c9-9e79-24eb67776644
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Année]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		lineageTag: 0de19b17-4275-489a-b29a-6275f57ef488
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Trimestre]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Trimestre Année'
+		lineageTag: 6fe935bc-bca2-4976-8976-87ab9e2bb32f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Trimestre Année]
+		sortByColumn: 'Trimestre Tri'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Trimestre Tri'
+		formatString: 0
+		lineageTag: 5e6b3eb2-5d3e-4719-8bef-c80bbe5b35ea
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Trimestre Tri]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mois Numéro'
+		formatString: 0
+		lineageTag: c48eecbb-d97d-41d1-9acd-75d357d0a39c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Mois Numéro]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mois
+		lineageTag: 470ac4e2-6c5e-454d-872d-1d38d714eee3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mois]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mois Court'
+		lineageTag: c352bbb0-5a06-47e0-95de-f9e123c359e8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mois Court]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mois Année'
+		lineageTag: a9845d10-ef4a-467f-97ea-ca6fcdd2793d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mois Année]
+		sortByColumn: 'Mois Année Tri'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mois Année Tri'
+		formatString: 0
+		lineageTag: 918cb47f-45c0-483c-8498-5b9c56f7e4a1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Mois Année Tri]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Semaine Numéro'
+		formatString: 0
+		lineageTag: 1d82c6d0-c124-47c5-b7a6-7be43fa89270
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Semaine Numéro]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Semaine Année'
+		lineageTag: ef979f63-a391-4c3b-9686-4cdb1444924a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Semaine Année]
+		sortByColumn: 'Semaine Tri'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Semaine Tri'
+		formatString: 0
+		lineageTag: 8dd70d89-c8a1-41ea-9f82-0734dc992c47
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Semaine Tri]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Jour
+		formatString: 0
+		lineageTag: cdae0ff8-297c-4b5f-be02-7a581b964df5
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Jour]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Jour Semaine Numéro'
+		formatString: 0
+		lineageTag: 840e74c0-c418-4142-897d-cc35000571e3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Jour Semaine Numéro]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Jour Nom'
+		lineageTag: a723d29a-a184-4e5f-b775-6acc8b943e40
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Jour Nom]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Date Affichage'
+		lineageTag: 391188ca-6b44-49b9-a744-89b77483fc4b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date Affichage]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Date = calculated
+		mode: import
+		source = ```
+				
+				VAR DateMin = CALCULATE ( MIN ( Fact_BDD[Date] ), ALL ( Fact_BDD ) )
+				VAR DateMax = CALCULATE ( MAX ( Fact_BDD[Date] ), ALL ( Fact_BDD ) )
+				
+				RETURN
+				ADDCOLUMNS (
+				    CALENDAR ( DateMin, DateMax ),
+				
+				    /* 1. ANNÉE */
+				    "Année", YEAR ( [Date] ),
+				
+				    /* 2. TRIMESTRE */
+				    "Trimestre", "T" & FORMAT ( [Date], "Q" ),
+				    "Trimestre Année", "T" & FORMAT ( [Date], "Q" ) & " " & YEAR ( [Date] ),
+				    "Trimestre Tri", YEAR ( [Date] ) * 10 + INT ( FORMAT ( [Date], "Q" ) ),
+				
+				    /* 3. MOIS */
+				    "Mois Numéro", MONTH ( [Date] ),
+				    "Mois", FORMAT ( [Date], "MMMM", "fr-FR" ),
+				    "Mois Court", FORMAT ( [Date], "MMM", "fr-FR" ),
+				    "Mois Année", FORMAT ( [Date], "MMM yyyy", "fr-FR" ),
+				    "Mois Année Tri", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+				
+				    /* 4. SEMAINE (ISO Strict) */
+				    "Semaine Numéro", 
+				        VAR JeudiISO = [Date] - WEEKDAY ( [Date], 2 ) + 4
+				        VAR AnneeISO = YEAR ( JeudiISO )
+				        VAR JeudiSemaine1 = DATE ( AnneeISO, 1, 4 ) - WEEKDAY ( DATE ( AnneeISO, 1, 4 ), 2 ) + 4
+				        RETURN 1 + INT ( ( JeudiISO - JeudiSemaine1 ) / 7 ),
+				    "Semaine Année",
+				        VAR JeudiISO = [Date] - WEEKDAY ( [Date], 2 ) + 4
+				        VAR AnneeISO = YEAR ( JeudiISO )
+				        VAR NumSem = 1 + INT ( ( JeudiISO - (DATE ( AnneeISO, 1, 4 ) - WEEKDAY ( DATE ( AnneeISO, 1, 4 ), 2 ) + 4) ) / 7 )
+				        RETURN "S" & FORMAT ( NumSem, "00" ) & " " & AnneeISO,
+				    "Semaine Tri",
+				        VAR JeudiISO = [Date] - WEEKDAY ( [Date], 2 ) + 4
+				        VAR AnneeISO = YEAR ( JeudiISO )
+				        VAR NumSem = 1 + INT ( ( JeudiISO - (DATE ( AnneeISO, 1, 4 ) - WEEKDAY ( DATE ( AnneeISO, 1, 4 ), 2 ) + 4) ) / 7 )
+				        RETURN AnneeISO * 100 + NumSem,
+				
+				    /* 5. JOUR */
+				    "Jour", DAY ( [Date] ),
+				    "Jour Semaine Numéro", WEEKDAY ( [Date], 2 ), -- 1 = Lundi
+				    "Jour Nom", FORMAT ( [Date], "dddd", "fr-FR" ),
+				    "Date Affichage", FORMAT ( [Date], "dd/MM/yyyy" )
+				)
+				```
+
+	annotation PBI_Id = be748bfe447a41589d84c4366d15ea63
+

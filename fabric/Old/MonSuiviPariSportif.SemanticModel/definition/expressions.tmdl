@@ -1,0 +1,7 @@
+expression CheminFichier = "C:\Users\dioue\OneDrive\Bureau\PowerBI-Projects\MonSuiviPariSportif\data\MonSuiviPariSportif.xlsx" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 820a89f0-96bd-4038-9dd1-0fa35b586b04
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

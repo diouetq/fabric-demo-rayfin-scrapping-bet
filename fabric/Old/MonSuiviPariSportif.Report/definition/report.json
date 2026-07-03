@@ -1,0 +1,131 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY25SU11",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "Violet8044522550196933.json",
+      "reportVersionAtImport": {
+        "visual": "2.4.0",
+        "report": "3.0.0",
+        "page": "2.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Middle'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6855"
+  ],
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "Croix44269818789027804.png",
+          "path": "Croix44269818789027804.png",
+          "type": "Image"
+        },
+        {
+          "name": "Croix8650239744538373.png",
+          "path": "Croix8650239744538373.png",
+          "type": "Image"
+        },
+        {
+          "name": "Croix86502397445383735962545703320594.png",
+          "path": "Croix86502397445383735962545703320594.png",
+          "type": "Image"
+        },
+        {
+          "name": "effacer-le-filtre5556926667431.png",
+          "path": "effacer-le-filtre5556926667431.png",
+          "type": "Image"
+        },
+        {
+          "name": "Filtre8012150226354613.png",
+          "path": "Filtre8012150226354613.png",
+          "type": "Image"
+        },
+        {
+          "name": "Fond_Gauche1403963342052953.png",
+          "path": "Fond_Gauche1403963342052953.png",
+          "type": "Image"
+        },
+        {
+          "name": "Logo16341163479408372.png",
+          "path": "Logo16341163479408372.png",
+          "type": "Image"
+        },
+        {
+          "name": "maison7298640166495391.png",
+          "path": "maison7298640166495391.png",
+          "type": "Image"
+        },
+        {
+          "name": "parametres5602955031579594.png",
+          "path": "parametres5602955031579594.png",
+          "type": "Image"
+        },
+        {
+          "name": "Violet8044522550196933.json",
+          "path": "Violet8044522550196933.json",
+          "type": "Image"
+        }
+      ]
+    },
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY25SU11",
+          "path": "BaseThemes/CY25SU11.json",
+          "type": "BaseTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

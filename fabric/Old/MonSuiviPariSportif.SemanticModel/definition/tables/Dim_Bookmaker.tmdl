@@ -1,0 +1,36 @@
+table Dim_Bookmaker
+	lineageTag: 1f125e8e-8aa0-4628-aaeb-ea70b4423338
+
+	column Bookmaker
+		dataType: string
+		lineageTag: f451fb8f-d23e-4217-99f8-bbf257a308e8
+		summarizeBy: none
+		sourceColumn: Bookmaker
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type_Bookmaker
+		dataType: string
+		lineageTag: 22f12c50-3b27-4109-96c9-043fd7618038
+		summarizeBy: none
+		sourceColumn: Type_Bookmaker
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Bookmaker = m
+		mode: import
+		source =
+				let
+				
+				    Source = Excel.Workbook(File.Contents(CheminFichier), null, true),
+				    BDD_Sheet = Source{[Item="Liste",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(BDD_Sheet, [PromoteAllScalars=true]),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Promoted Headers",{"Bookmaker", "Type_Bookmaker"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each ([Bookmaker] <> null))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

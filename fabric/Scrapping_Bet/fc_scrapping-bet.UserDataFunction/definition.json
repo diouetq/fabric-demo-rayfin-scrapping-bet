@@ -1,0 +1,50 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/userDataFunction/definition/1.1.0/schema.json",
+  "runtime": "PYTHON",
+  "connectedDataSources": [
+    {
+      "alias": "rayfindb",
+      "artifactId": "c4f29808-ad0c-8024-4283-c19cd9b75c4c",
+      "artifactType": "SqlDbNative",
+      "workspaceId": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "alias": "scrappingbet",
+      "artifactId": "4423190a-684f-4cf0-91bc-89fe9fabeb67",
+      "artifactType": "SqlDbNative",
+      "workspaceId": "41d4b6d3-34d9-41d3-a051-9f91192cc26a"
+    }
+  ],
+  "functions": [
+    {
+      "name": "fetchSlottBetline",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    },
+    {
+      "name": "getSlottJobStatus",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    },
+    {
+      "name": "scrapeAndStoreSlott",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    },
+    {
+      "name": "scrapeSlott",
+      "description": "",
+      "isPublicEndpointEnabled": true
+    }
+  ],
+  "libraries": {
+    "public": [
+      {
+        "name": "fabric-user-data-functions",
+        "type": "PYPI",
+        "version": "1.0"
+      }
+    ],
+    "private": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SQLDatabase",
+    "displayName": "rayfindb",
+    "description": "SQL Database for Rayfin application"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c4f29808-ad0c-8024-4283-c19cd9b75c4c"
+  }
+}

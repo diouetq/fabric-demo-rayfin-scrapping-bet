@@ -1,0 +1,28 @@
+table Dim_TypeBet
+	lineageTag: d101f6c2-46d5-4df8-a18e-e9ca82b5ecf0
+
+	column Boost
+		dataType: string
+		lineageTag: 37e3343e-0ac1-42c3-a1a0-b6b10902f1e5
+		summarizeBy: none
+		sourceColumn: Boost
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_TypeBet = m
+		mode: import
+		source =
+				let
+				
+				    Source = Excel.Workbook(File.Contents(CheminFichier), null, true),
+				    BDD_Sheet = Source{[Item="Liste",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(BDD_Sheet, [PromoteAllScalars=true]),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Promoted Headers",{ "Boost"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each ([Boost] <> null))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

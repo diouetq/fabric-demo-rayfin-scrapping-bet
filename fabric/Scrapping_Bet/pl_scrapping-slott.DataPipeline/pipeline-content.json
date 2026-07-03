@@ -1,0 +1,27 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "AzureFunctionActivity",
+        "typeProperties": {
+          "functionName": "scrapeAndStoreSlott",
+          "functionSetId": "d4bdbbbf-31c6-9ca9-4a14-6183efe61443",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {}
+        },
+        "externalReferences": {
+          "connection": "5471658d-fb13-47af-b231-26e03cf7aa04"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Scrape_Slott",
+        "dependsOn": []
+      }
+    ]
+  }
+}

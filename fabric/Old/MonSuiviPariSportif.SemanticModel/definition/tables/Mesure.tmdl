@@ -1,0 +1,2017 @@
+table Mesure
+	lineageTag: 57679850-7224-45d6-a9ae-cfd5570f1629
+
+	/// Génère un affichage HTML stylisé des filtres actuellement appliqués (Date, Bookmaker, Type de Pari, Sport, Cotes). Affiche 'Tous' si aucun filtre n'est actif.
+	measure '_HTML_(FILTRES SELECTIONNES)' = ```
+			
+							
+							
+							VAR _font_color = "black"
+							VAR _background_color = "#F5F8FB"
+							
+							
+							VAR _1_ = SELECTEDVALUE('Dim_Date'[Date])
+							VAR _2_ = SELECTEDVALUE('Dim_Bookmaker'[Bookmaker])
+							VAR _3_ = SELECTEDVALUE('Dim_TypeBet'[Boost])
+							VAR _4_ = SELECTEDVALUE('Dim_Sport'[Sport])
+							VAR _5_ = SELECTEDVALUE('Fact_BDD'[Cote])
+							VAR _6_ = ""
+							VAR _7_ = ""
+							VAR _8_ = ""
+							VAR _9_ = ""
+							
+							
+							-- Defines the HTML styling for the filter display. Ensure consistency with the report's design and readability.
+							VAR htmlStyle = 
+							    "<span style='
+							        display:inline-block; 
+							        background-color:linear-gradient(135deg,#FFFFFF 0%,rgba(249,250,251,0.3) 100%); 
+							        color:"&_font_color&"; 
+							        padding:3.5px 7px; 
+							        border-radius:5px; 
+							        border: 2px solid #E5E7EB; 
+							        margin-right:6px; 
+							        line-height:1.25; 
+							        white-space: nowrap; 
+							        overflow: hidden; 
+							        text-overflow: ellipsis; 
+							        max-width: 1550px;
+							        font-size:9px;
+							    '>"
+							
+							
+			VAR Html_1 =
+			VAR _MinSelected =
+			    CALCULATE (
+			        MIN ( 'Dim_Date'[Date] ),
+			        ALLSELECTED ( 'Dim_Date' )
+			    )
+			
+			VAR _MaxSelected =
+			    CALCULATE (
+			        MAX ( 'Dim_Date'[Date] ),
+			        ALLSELECTED ( 'Dim_Date' )
+			    )
+			
+			VAR _MinAll =
+			    CALCULATE (
+			        MIN ( 'Dim_Date'[Date] ),
+			        ALL ( 'Dim_Date' )
+			    )
+			
+			VAR _MaxAll =
+			    CALCULATE (
+			        MAX ( 'Dim_Date'[Date] ),
+			        ALL ( 'Dim_Date' )
+			    )
+			
+			RETURN
+			IF (
+			    _MinSelected = _MinAll
+			        && _MaxSelected = _MaxAll,
+			
+			    -- 🔹 Aucun filtre réel
+			    BLANK (),
+			
+			    -- 🔹 Filtré
+			    htmlStyle
+			        & "<b><i class='fa fa-globe'></i> Date :</b> "
+			        & FORMAT ( _MinSelected, "dd/MM/yyyy" )
+			        & " → "
+			        & FORMAT ( _MaxSelected, "dd/MM/yyyy" )
+			        & "</span>"
+			)
+			
+							
+			VAR Html_2 = 
+			IF (
+			    ISFILTERED ( 'Dim_Bookmaker'[Bookmaker] )
+			        || ISFILTERED ( 'Dim_Bookmaker'[Type_Bookmaker] ),
+			
+			    VAR _Table =
+			        ADDCOLUMNS (
+			            VALUES ( 'Dim_Bookmaker'[Type_Bookmaker] ),
+			
+			            "NbTotal",
+			                CALCULATE (
+			                    DISTINCTCOUNT ( 'Dim_Bookmaker'[Bookmaker] ),
+			                    ALLEXCEPT (
+			                        'Dim_Bookmaker',
+			                        'Dim_Bookmaker'[Type_Bookmaker]
+			                    )
+			                ),
+			
+			            "NbSelected",
+			                CALCULATE (
+			                    DISTINCTCOUNT ( 'Dim_Bookmaker'[Bookmaker] )
+			                ),
+			
+			            "ListSelected",
+			                CONCATENATEX (
+			                    VALUES ( 'Dim_Bookmaker'[Bookmaker] ),
+			                    'Dim_Bookmaker'[Bookmaker],
+			                    ", "
+			                )
+			        )
+			
+			    VAR _DisplayText =
+			        CONCATENATEX (
+			            FILTER ( _Table, [NbSelected] > 0 ),
+			            IF (
+			                [NbSelected] = [NbTotal],
+			                "<b>Type de Bookmaker:</b> " & 'Dim_Bookmaker'[Type_Bookmaker],
+			                "<b>Bookmaker :</b> " & [ListSelected]
+			            ),
+			            " | "
+			        )
+			
+			    RETURN
+			        htmlStyle
+			            & _DisplayText
+			            & "</span>",
+			
+			    BLANK ()
+			)
+							
+							VAR Html_3 =
+							    IF(
+							        ISFILTERED('Dim_TypeBet'[Boost]),
+							        VAR Html_3 = ALLSELECTED('Dim_TypeBet'[Boost])  
+							        RETURN
+							            htmlStyle & "<b><i class='fa fa-globe'></i>Type de pari:</b> " & 
+							            CONCATENATEX(Html_3, 'Dim_TypeBet'[Boost], ", ") & "</span>",
+							        BLANK()
+							    )
+							
+							VAR Html_4 =
+							    IF(
+							        ISFILTERED('Dim_Sport'[Sport]),
+							        VAR Html_4 = ALLSELECTED('Dim_Sport'[Sport])  
+							        RETURN
+							            htmlStyle & "<b><i class='fa fa-user'></i>Sport:</b> " & 
+							            CONCATENATEX(Html_4, 'Dim_Sport'[Sport], ", ") & "</span>",
+							        BLANK()
+							    )
+							
+			VAR Html_5 =
+			VAR _MinSelected =
+			    CALCULATE (
+			        MIN ( 'Dim_Odds'[Odds] ),
+			        ALLSELECTED ( 'Dim_Odds' )
+			    )
+			
+			VAR _MaxSelected =
+			    CALCULATE (
+			        MAX ( 'Dim_Odds'[Odds] ),
+			        ALLSELECTED ( 'Dim_Odds' )
+			    )
+			
+			VAR _MinAll =
+			    CALCULATE (
+			        MIN ( 'Dim_Odds'[Odds] ),
+			        ALL ( 'Dim_Odds' )
+			    )
+			
+			VAR _MaxAll =
+			    CALCULATE (
+			        MAX ( 'Dim_Odds'[Odds] ),
+			        ALL ( 'Dim_Odds' )
+			    )
+			
+			RETURN
+			IF (
+			    _MinSelected = _MinAll
+			        && _MaxSelected = _MaxAll,
+			
+			    -- 🔹 Aucun filtre réel
+			    BLANK (),
+			
+			    -- 🔹 Filtré
+			    htmlStyle
+			        & "<b><i class='fa fa-user'></i> Cotes :</b> "
+			        & FORMAT ( _MinSelected, "0.00" )
+			        & " → "
+			        & FORMAT ( _MaxSelected, "0.00" )
+			        & "</span>"
+			)
+							
+							
+				/*			VAR Html_6 =
+							    IF(
+							        ISFILTERED('BDD'[Cote]),
+							        VAR Html_6 = ALLSELECTED('BDD'[Cote])  
+							        RETURN
+							            htmlStyle & "<b><i class='fa fa-user'></i> Segment SIM:</b> " & 
+							            CONCATENATEX(Html_6, 'BDD'[Cote], ", ") & "</span>",
+							        BLANK()
+							    )
+			
+			    */
+			
+			
+							
+							VAR _No_Filter = htmlStyle & "<b><i class='fa fa-user'></i> Tout</b></span>"
+							
+							-- Combines all filter sections into a single output.
+							VAR CombinedFilterSummary = Html_1 & Html_2 & Html_3 & Html_4 & Html_5
+							    
+							RETURN
+							
+							IF(ISBLANK(CombinedFilterSummary),_No_Filter,CombinedFilterSummary)
+			```
+		displayFolder: Autres
+		lineageTag: 4bcb67a4-1f7e-4257-a24e-0e1f29c14076
+
+	/// Calcule le taux de réussite des paris : nombre de paris gagnants divisé par le nombre total de paris avec résultats. Retourne 'Nd' si aucune donnée disponible.
+	measure '_KPI_(Taux Reussite %)' =
+			
+			
+			
+			VAR _Part =
+			
+			COALESCE(CALCULATE(COUNT(Fact_BDD[Événement]), Fact_BDD[Résultat] = "Gagné"),0)
+			
+			/
+			
+			CALCULATE(COUNT(Fact_BDD[Événement]), Fact_BDD[Résultat]<>"")
+			
+			
+			RETURN
+			
+			IF(ISBLANK(_Part),"Nd", _Part )
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: KPI
+		lineageTag: b42daf9a-69ee-42ab-a214-b1b72c84620b
+
+	/// Calcule le retour sur investissement (ROI) : (Gain Total - Mise Totale) / Mise Totale. Exprimé en pourcentage.
+	measure _KPI_(ROI) =
+			
+			
+			([_KPI_(Gain Total)] - [_KPI_(Mise Totale)]) / [_KPI_(Mise Totale)]
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: KPI
+		lineageTag: d72356e7-13ef-4d7e-a190-5beb3d4fef06
+
+	/// Compte le nombre total de paris (événements) dans le contexte de filtre actuel.
+	measure _KPI_(Paris) =
+			
+			
+			CALCULATE(COUNT(Fact_BDD[Événement]))
+		formatString: 0
+		displayFolder: KPI
+		lineageTag: e489f557-a3d7-4c91-a5d7-38afcea8657b
+
+	/// Calcule le profit net : différence entre les Gains Totaux et les Mises Totales.
+	measure _KPI_(Profits) =
+			
+			
+			IF(SELECTEDVALUE(Fact_BDD[Boost])="Mise Freebet" && SELECTEDVALUE(Fact_BDD[Résultat])="Gagné",[_KPI_(Gain Total)],
+			[_KPI_(Gain Total)]-[_KPI_(Mise Totale)])
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		displayFolder: KPI
+		lineageTag: 09a033ea-4231-4d79-9950-ba75b6defc15
+
+	/// Somme totale des mises placées. Retourne 0 si aucune donnée.
+	measure '_KPI_(Mise Totale)' =
+			
+			
+			COALESCE(CALCULATE(SUM(Fact_BDD[Mise])),0)
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		displayFolder: KPI
+		lineageTag: b07baa29-cc9e-4660-9ab1-7b13b323176f
+
+	/// Somme totale des gains obtenus. Retourne 0 si aucune donnée.
+	measure '_KPI_(Gain Total)' =
+			
+			
+			COALESCE(CALCULATE(SUM(Fact_BDD[Gain])),0)
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		displayFolder: KPI
+		lineageTag: 6ad09c73-76c9-4466-861e-d387abf68d60
+
+	/// Calcule le profit cumulé jusqu'à la date maximale sélectionnée. Permet de visualiser l'évolution du profit dans le temps.
+	measure '_KPI_(Profits Cumules)' =
+			
+			
+			CALCULATE(
+			    [_KPI_(Profits)],
+			    FILTER(
+			        ALL(Dim_Date),
+			        Dim_Date[Date] <= MAX(Dim_Date[Date])
+			    )
+			)
+		formatString: #,0\ "€";-#,0\ "€";#,0\ "€"
+		displayFolder: KPI
+		lineageTag: fe7f21ea-bc9f-4ba9-a14b-92c28475e380
+
+	/// Retourne 'rouge' si les profits sont négatifs, 'vert' si positifs ou nuls. Utilisé pour la mise en forme conditionnelle.
+	measure '_KPI_(Profits Couleur)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(Profits)]<0, [_COULEUR_(Negatif)],
+			[_KPI_(Profits)]>=0, [_COULEUR_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: 0838687a-a196-4f5a-9afa-0423781a8978
+
+	/// Retourne 'rouge' si le ROI est négatif, 'vert' si positif ou nul. Utilisé pour la mise en forme conditionnelle.
+	measure '_KPI_(ROI Couleur)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(ROI)]<0, [_COULEUR_(Negatif)],
+			[_KPI_(ROI)]>=0, [_COULEUR_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: b93a606c-7330-45b5-bae0-8ec38c10d6ae
+
+	/// Retourne 'rouge' si le taux de réussite est inférieur à 50%, 'vert' si supérieur ou égal à 50%. Utilisé pour la mise en forme conditionnelle.
+	measure '_KPI_(Taux Reussite Couleur)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(Taux Reussite %)]<0.5, [_COULEUR_(Negatif)],
+			[_KPI_(Taux Reussite %)]>=0.5, [_COULEUR_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: 81d9538c-e010-429c-8897-091054bc6e21
+
+	/// Retourne le code couleur vert pour les valeurs positives dans la mise en forme conditionnelle.
+	measure _COULEUR_(Positif) =
+			
+			
+			"#3CBFA5"
+		displayFolder: Parametre
+		lineageTag: 0c64937f-2d0b-4c9c-98c0-e03eb872503e
+
+	/// Retourne le code couleur rouge pour les valeurs négatives dans la mise en forme conditionnelle.
+	measure _COULEUR_(Negatif) =
+			
+			
+			"#C73659"
+		displayFolder: Parametre
+		lineageTag: 708e760d-fba0-4402-b725-642864479e83
+
+	measure '_SVG_(Résultat Pari Tableau)' = ```
+			
+			
+			VAR Resultat = MAX ( Fact_BDD[Résultat] )
+			
+			-- Couleur principale selon le résultat
+			VAR Couleur =
+			    SWITCH (
+			        Resultat,
+			        "Gagné", [_COULEUR_(Positif)],
+			        "Perdu", [_COULEUR_(Negatif)],
+			        "Remboursé/Annulé", "#6c757d",
+			        "#000000"
+			    )
+			
+			-- Profit brut
+			VAR ProfitBrut = [_KPI_(Profits)]
+			
+			-- Profit formaté (+ / -) uniquement si gagné ou perdu et non nul
+			VAR ProfitFormate =
+			    IF (
+			        Resultat <> "Remboursé/Annulé" && ProfitBrut <> 0,
+			        FORMAT ( ProfitBrut, "+#,##0.00 €;-#,##0.00 €" ),
+			        BLANK ()
+			    )
+			
+			-- Couleur du profit (indépendante du statut)
+			VAR CouleurProfit =
+			    IF ( ProfitBrut > 0, [_COULEUR_(Positif)], [_COULEUR_(Negatif)] )
+			
+			-- Rectangle
+			VAR Box =
+			    "<rect x='1' y='1' rx='10' ry='10' width='115' height='18' 
+			        fill='" & Couleur & "' 
+			        fill-opacity='0.15' 
+			        stroke='" & Couleur & "' 
+			        stroke-width='1.5' />"
+			
+			-- Texte SVG (Résultat + Profit)
+			VAR Callout =
+			    "<text x='55' y='14' 
+			        fill='" & Couleur & "' 
+			        font-size='9' 
+			        font-weight='bold' 
+			        font-family='Segoe UI, sans-serif' 
+			        text-anchor='middle'>" &
+			            Resultat &
+			            IF (
+			                NOT ISBLANK ( ProfitFormate ),
+			                "<tspan dx='6' font-weight='600' fill='" & CouleurProfit & "'>" &
+			                    ProfitFormate &
+			                "</tspan>",
+			                ""
+			            ) &
+			    "</text>"
+			
+			RETURN
+			IF (
+			    HASONEVALUE ( Fact_BDD[Résultat] ),
+			    "data:image/svg+xml;utf8," &
+			        "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='20' viewBox='0 0 200 20'>" &
+			            Box & Callout &
+			        "</svg>",
+			    BLANK ()
+			)
+			
+			```
+		displayFolder: Autres
+		lineageTag: 9c206b7b-c15a-49b6-a315-0df7de15b24d
+		dataCategory: ImageUrl
+
+	measure '_FILTRE_(Derniers 5 Paris Tableau)' = ```
+			
+			
+			VAR IndexActuel = MAX(Fact_BDD[Index]) -- Ou le nom de votre colonne Index
+			
+			-- On compte combien d'index sont supérieurs ou égaux à l'index de la ligne actuelle
+			VAR Rang = 
+			    COUNTROWS(
+			        FILTER(
+			            ALLSELECTED(Fact_BDD),
+			            Fact_BDD[Index] >= IndexActuel
+			        )
+			    )
+			
+			RETURN
+			IF(Rang <= 5, 1, 0)
+			```
+		formatString: 0
+		displayFolder: Autres
+		lineageTag: bb81eb3e-0e40-4f43-9a0c-4c2d6e8d71e5
+
+	measure _PICTO_(Neutre) = ```
+			
+			VAR Couleur = [_COULEUR_(Violet)]
+			RETURN
+			"data:image/svg+xml;utf8," & 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>" & 
+			    -- Fond incliné (ici neutre à 0° pour varier ou -10° pour uniformiser)
+			    "<rect x='2' y='2' width='20' height='20' rx='6' fill='" & Couleur & "' fill-opacity='0.12' transform='rotate(5 12 12)' />" & 
+			    -- Tes lignes de graphique
+			    "<g fill='none' stroke='" & Couleur & "' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>" & 
+			        "<line x1='18' y1='17' x2='18' y2='10'></line>" & 
+			        "<line x1='12' y1='17' x2='12' y2='7'></line>" & 
+			        "<line x1='6' y1='17' x2='6' y2='13'></line>" & 
+			    "</g>" & 
+			"</svg>"
+			```
+		displayFolder: Parametre
+		lineageTag: ab9d834e-0f3d-4bfb-930b-f69785d36ceb
+		dataCategory: ImageUrl
+
+	measure _PICTO_(Negatif) = ```
+			
+			VAR Couleur = [_COULEUR_(Negatif)]
+			RETURN
+			"data:image/svg+xml;utf8," & 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>" & 
+			    -- Forme d'arrière-plan stylisée
+			    "<rect x='2' y='2' width='20' height='20' rx='6' fill='" & Couleur & "' fill-opacity='0.1' transform='rotate(10 12 12)' />" & 
+			    -- L'icône X centrée
+			    "<g stroke='" & Couleur & "' stroke-width='2.5' stroke-linecap='round'>" & 
+			        "<path d='M16 8l-8 8M8 8l8 8' />" & 
+			    "</g>" & 
+			"</svg>"
+			```
+		displayFolder: Parametre
+		lineageTag: ba4a9366-a17a-49ff-ad0d-7fda09a80f24
+		dataCategory: ImageUrl
+
+	measure _PICTO_(Positif) = ```
+			
+			VAR Couleur = [_COULEUR_(Positif)]
+			RETURN
+			"data:image/svg+xml;utf8," & 
+			"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>" & 
+			    -- Fond incliné
+			    "<rect x='2' y='2' width='20' height='20' rx='6' fill='" & Couleur & "' fill-opacity='0.12' transform='rotate(-10 12 12)' />" & 
+			    -- Ton icône préférée
+			    "<g fill='none' stroke='" & Couleur & "' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'>" & 
+			        "<path d='M21 11.08V12a10 10 0 1 1-5.93-9.14'></path>" & 
+			        "<polyline points='22 4 12 14.01 9 11.01'></polyline>" & 
+			    "</g>" & 
+			"</svg>"
+			```
+		displayFolder: Parametre
+		lineageTag: 2f402240-e2ac-492c-be42-fb6ca5614faa
+
+	measure _COULEUR_(Violet) =
+			
+			
+			"#7161EF"
+		displayFolder: Parametre
+		lineageTag: 538c510a-e6ab-4b7b-9945-7c9e3708e616
+
+	measure _COULEUR_(Gris) =
+			
+			
+			"#666666"
+		displayFolder: Parametre
+		lineageTag: bf7674b8-dacf-4bea-891b-0277ab0e6662
+
+	measure '_KPI_(Taux Reussite Picto)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(Taux Reussite %)]<0.5, [_PICTO_(Negatif)],
+			[_KPI_(Taux Reussite %)]>=0.5, [_PICTO_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: 01f3d4ef-8aca-4beb-97d2-efc3a5cfe498
+
+	measure '_KPI_(ROI Picto)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(ROI)]<0, [_PICTO_(Negatif)],
+			[_KPI_(ROI)]>=0, [_PICTO_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: f72eaefb-8644-4f83-b75d-eb5f3367bae2
+
+	measure '_KPI_(Profits Picto)' =
+			
+			
+			SWITCH(TRUE(),
+			[_KPI_(Profits)]<0, [_PICTO_(Negatif)],
+			[_KPI_(Profits)]>=0, [_PICTO_(Positif)],
+			"")
+		displayFolder: KPI
+		lineageTag: 82f37ecd-0f3c-4007-a82b-bf6dbf3204ba
+
+	measure '_KPI_(Cote Moyenne)' =
+			
+			
+			IF([_KPI_(Paris)]>0, AVERAGE(Fact_BDD[Cote]), BLANK())
+		formatString: 0.00
+		displayFolder: KPI
+		lineageTag: c3d4e5f6-a7b8-49ca-ad2e-3f4a5b6c7d8e
+
+	measure '_KPI_(Profit Moyen par Pari)' =
+			
+			
+			IF([_KPI_(Paris)]>0, [_KPI_(Profits)]/[_KPI_(Paris)], BLANK())
+		formatString: €#,##0.00
+		displayFolder: KPI
+		lineageTag: d4e5f6a7-b8c9-4adb-ae3f-4a5b6c7d8e9f
+
+	measure '_SVG_(Top 3 Bookmakers)' = ```
+			
+			-- ---------------------------------------------------------
+			-- 1. CONFIGURATION & RANG
+			-- ---------------------------------------------------------
+			VAR RangDuPodium = SELECTEDVALUE(Dim_Podium[Rang])
+			VAR CouleurFond   = [_COULEUR_(Positif)]
+			VAR CouleurChiffre = "#FFFFFF"
+			VAR CouleurTexte   = "#666666"
+			VAR CouleurKPI    = "#666666"
+			
+			-- Tailles adaptées au format compact
+			VAR TailleCarre   = 22
+			VAR TailleChiffre = "14px"
+			VAR TailleTexte   = "11px"
+			VAR TailleKPI     = "9px"
+			VAR Arrondi       = 4
+			
+			-- Positionnement ajusté avec plus d'espace
+			VAR PosXTexte     = 40  
+			VAR PosYTexte     = 17  
+			VAR HauteurSVG    = 30
+			VAR LargeurSVG    = 130 
+			
+			-- ---------------------------------------------------------
+			-- 2. LOGIQUE : DYNAMISATION DU KPI
+			-- ---------------------------------------------------------
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			-- On crée la table avec bookmaker et sa valeur
+			VAR TableAvecValeurs = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(Fact_BDD, Fact_BDD[Bookmaker]),
+			        "@Valeur", 
+			[_KPI_(Choix)]
+			    )
+			
+			-- On filtre pour garder seulement les bookmakers avec une valeur
+			VAR TableFiltree = FILTER(TableAvecValeurs, NOT(ISBLANK([@Valeur])))
+			
+			-- On ajoute le rang
+			VAR TableAvecRang = 
+			    ADDCOLUMNS(
+			        TableFiltree,
+			        "@Rang", RANKX(TableFiltree, [@Valeur], , DESC, DENSE)
+			    )
+			
+			-- On récupère le bookmaker et la valeur correspondant au rang
+			VAR LigneSelectionnee = FILTER(TableAvecRang, [@Rang] = RangDuPodium)
+			
+			VAR NomBookmaker = MAXX(LigneSelectionnee, Fact_BDD[Bookmaker])
+			
+			VAR ValeurKPI = MAXX(LigneSelectionnee, [@Valeur])
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			    FORMAT(ValeurKPI, FormatKPISel)
+			
+			
+			-- ---------------------------------------------------------
+			VAR CentreCarreX = 5 + (TailleCarre / 2)
+			VAR CentreCarreY = 4 + (TailleCarre / 2)
+			
+			VAR CodeSVG = 
+			    "data:image/svg+xml;utf8," & 
+			    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 " & LargeurSVG & " " & HauteurSVG & "'>" & 
+			        "<rect x='5' y='4' width='" & TailleCarre & "' height='" & TailleCarre & "' rx='" & Arrondi & "' " &
+			        "fill='" & CouleurFond & "' />" & 
+			        "<text x='" & CentreCarreX & "' y='" & CentreCarreY + 1 & "' text-anchor='middle' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:900; font-size:" & TailleChiffre & ";' fill='" & CouleurChiffre & "'>" & 
+			        RangDuPodium & "</text>" & 
+			        "<text x='" & PosXTexte & "' y='" & PosYTexte & "' text-anchor='start' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:700; font-size:" & TailleTexte & ";' fill='" & CouleurTexte & "'>" & 
+			        NomBookmaker & 
+			        "<tspan dx='5' style='font-weight:400; font-size:" & TailleKPI & ";' fill='" & CouleurKPI & "'>" & ValeurFormatee & "</tspan>" &
+			        "</text>" & 
+			    "</svg>"
+			
+			RETURN
+			IF(ISBLANK(NomBookmaker), BLANK(), CodeSVG)
+			```
+		displayFolder: Bookmaker
+		lineageTag: e5f6a7b8-c9da-4bec-af40-5b6c7d8e9fa0
+		dataCategory: ImageUrl
+
+	measure '_KPI_(Paris % Classique)' =
+			
+			
+			VAR DENOM = COALESCE(CALCULATE(COUNT(Fact_BDD[Événement])),0)
+			
+			VAR NUM = COALESCE(CALCULATE(COUNT(Fact_BDD[Événement]),Dim_TypeBet[Boost]="Paris Classique"),0)
+			
+			RETURN
+			
+			DIVIDE(NUM,DENOM,0)
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		displayFolder: KPI
+		lineageTag: 395a69e7-b277-4d5c-9a64-26b348d8e7f4
+
+	measure '_KPI_(Cote Moyenne Gagné)' =
+			
+			
+			CALCULATE([_KPI_(Cote Moyenne)],Fact_BDD[Résultat]="Gagné")
+		formatString: #,0.00
+		displayFolder: KPI
+		lineageTag: 4d6dd1c6-423d-4f9b-84e6-a0ad3f314b21
+
+	measure '_KPI_(Cote Moyenne Perdu)' =
+			
+			
+			CALCULATE([_KPI_(Cote Moyenne)],Fact_BDD[Résultat]="Perdu")
+		formatString: 0.00
+		displayFolder: KPI
+		lineageTag: 6e296f73-1f8d-4e40-90b3-6e4f9b8e3ce3
+
+	measure '_COULEUR_(Tableau Bookmaker Fond)' = ```
+			
+			
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			```
+		displayFolder: Bookmaker
+		lineageTag: a7fa9a1b-0846-4d13-8f88-12137e2bf97e
+
+	measure '_COULEUR_(Tableau Bookmaker Police)' =
+			
+			
+			SWITCH(
+			    TRUE(),
+			
+			    ISINSCOPE(Dim_Bookmaker[Bookmaker]), "",
+			
+			    ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", "blach",
+			
+			    ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", "blach",
+			
+			    "white"
+			)
+		displayFolder: Bookmaker
+		lineageTag: 57befdb7-3490-436c-8d0a-9ba6f8f4ea6f
+
+	measure '_LIBELLE_(Tableau Bookmaker)' =
+			
+			
+			SWITCH(
+			    TRUE(),
+			
+			    ISINSCOPE(Dim_Bookmaker[Bookmaker]), SELECTEDVALUE(Dim_Bookmaker[Bookmaker]),
+			
+			    ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]),SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]),
+			
+			    "Total"
+			)
+		displayFolder: Bookmaker
+		lineageTag: 0d6d55b1-5c63-4c8d-98fb-420eba2ad320
+
+	measure '_SVG_(Down 3 Bookmakers)' = ```
+			
+			-- ---------------------------------------------------------
+			-- 1. CONFIGURATION & RANG
+			-- ---------------------------------------------------------
+			VAR RangDuFlop = SELECTEDVALUE(Dim_Podium[Rang])
+			VAR CouleurFond   = [_COULEUR_(Negatif)]  -- Couleur différente pour le flop
+			VAR CouleurChiffre = "#FFFFFF"
+			VAR CouleurTexte   = "#666666"
+			VAR CouleurKPI    = "#666666"
+			
+			-- Tailles adaptées au format compact
+			VAR TailleCarre   = 22
+			VAR TailleChiffre = "14px"
+			VAR TailleTexte   = "11px"
+			VAR TailleKPI     = "9px"
+			VAR Arrondi       = 4
+			
+			-- Positionnement ajusté avec plus d'espace
+			VAR PosXTexte     = 40  
+			VAR PosYTexte     = 17  
+			VAR HauteurSVG    = 30
+			VAR LargeurSVG    = 130 
+			
+			-- ---------------------------------------------------------
+			-- 2. LOGIQUE : DYNAMISATION DU KPI (ORDRE INVERSE)
+			-- ---------------------------------------------------------
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			-- On crée la table avec bookmaker et sa valeur
+			VAR TableAvecValeurs = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(Fact_BDD, Fact_BDD[Bookmaker]),
+			        "@Valeur", 
+			[_KPI_(Choix)]
+			    )
+			
+			-- On filtre pour garder seulement les bookmakers avec une valeur
+			VAR TableFiltree = FILTER(TableAvecValeurs, NOT(ISBLANK([@Valeur])))
+			
+			-- On ajoute le rang INVERSÉ (ASC au lieu de DESC)
+			VAR TableAvecRang = 
+			    ADDCOLUMNS(
+			        TableFiltree,
+			        "@Rang", RANKX(TableFiltree, [@Valeur], , ASC, DENSE)
+			    )
+			
+			-- On récupère le bookmaker et la valeur correspondant au rang
+			VAR LigneSelectionnee = FILTER(TableAvecRang, [@Rang] = RangDuFlop)
+			
+			VAR NomBookmaker = MAXX(LigneSelectionnee, Fact_BDD[Bookmaker])
+			
+			VAR ValeurKPI = MAXX(LigneSelectionnee, [@Valeur])
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			    FORMAT(ValeurKPI, FormatKPISel)
+			
+			-- ---------------------------------------------------------
+			-- 3. RENDU : CONSTRUCTION DU SVG
+			-- ---------------------------------------------------------
+			VAR CentreCarreX = 5 + (TailleCarre / 2)
+			VAR CentreCarreY = 4 + (TailleCarre / 2)
+			
+			VAR CodeSVG = 
+			    "data:image/svg+xml;utf8," & 
+			    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 " & LargeurSVG & " " & HauteurSVG & "'>" & 
+			        "<rect x='5' y='4' width='" & TailleCarre & "' height='" & TailleCarre & "' rx='" & Arrondi & "' " &
+			        "fill='" & CouleurFond & "' />" & 
+			        "<text x='" & CentreCarreX & "' y='" & CentreCarreY + 1 & "' text-anchor='middle' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:900; font-size:" & TailleChiffre & ";' fill='" & CouleurChiffre & "'>" & 
+			        RangDuFlop & "</text>" & 
+			        "<text x='" & PosXTexte & "' y='" & PosYTexte & "' text-anchor='start' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:700; font-size:" & TailleTexte & ";' fill='" & CouleurTexte & "'>" & 
+			        NomBookmaker & 
+			        "<tspan dx='5' style='font-weight:400; font-size:" & TailleKPI & ";' fill='" & CouleurKPI & "'>" & ValeurFormatee & "</tspan>" &
+			        "</text>" & 
+			    "</svg>"
+			
+			RETURN
+			IF(ISBLANK(NomBookmaker), BLANK(), CodeSVG)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 5d1216d3-7e3e-4eb9-8fca-b0ab10c821cc
+		dataCategory: ImageUrl
+
+	measure _KPI_(Choix) = ```
+			
+			
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			RETURN
+			        
+			        CALCULATE(
+			            SWITCH(
+			                NomKPISel,
+			                "KPI_(Paris)", [_KPI_(Paris)],
+			                "KPI_(Taux Reussite %)", [_KPI_(Taux Reussite %)],
+			                "KPI_(ROI)", [_KPI_(ROI)],
+			                "KPI_(Profits)", [_KPI_(Profits)],
+			                "KPI_(Mise Totale)", [_KPI_(Mise Totale)],
+			                "KPI_(Gain Total)", [_KPI_(Gain Total)],
+			                "KPI_(Cote Moyenne)", [_KPI_(Cote Moyenne)],
+			                "KPI_(Cote Moyenne Gagné)", [_KPI_(Cote Moyenne Gagné)],
+			                "KPI_(Cote Moyenne Perdu)", [_KPI_(Cote Moyenne Perdu)],
+			                "KPI_(Paris % Classique)", [_KPI_(Paris % Classique)],
+			                [_KPI_(Profits)]
+			            )
+			        )
+			```
+		displayFolder: KPI
+		lineageTag: 8b20f4ba-ae08-4fac-ab66-4092afed4b35
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 2 ROI)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(ROI)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 389443cb-d56a-45f3-9c5c-0316fe8bc587
+
+	measure '_COULEUR_(KPI Tableau Fond Cat)' =
+			
+			
+			"#957FEF"
+		displayFolder: Parametre
+		lineageTag: 20da9996-5d0d-4208-b796-7916f1cb2921
+
+	measure '_COULEUR_(KPI Tableau Fond Ss Cat)' =
+			
+			
+			"#EDEBFF"
+		displayFolder: Parametre
+		lineageTag: f36556d4-52a2-4c2a-9695-1a63d00f5f0b
+
+	measure '_COULEUR_(KPI Tableau Fond Total)' =
+			
+			
+			"#393178"
+		displayFolder: Parametre
+		lineageTag: c736348b-9cdb-4584-81b0-7f52b6bdcc02
+
+	measure '_COULEUR_(KPI No Tableau Fond Total)' =
+			
+			
+			"#666666"
+		displayFolder: Parametre
+		lineageTag: b24a3dd8-c7fd-4b19-8eea-3bf0624afced
+
+	measure '_COULEUR_(KPI No Tableau Fond Cat)' =
+			
+			
+			"#E6E6E6"
+		displayFolder: Parametre
+		lineageTag: 0310dd23-7589-44a9-b32a-880f60348759
+
+	measure '_COULEUR_(KPI No Tableau Fond Ss Cat)' =
+			
+			
+			""
+		displayFolder: Parametre
+		lineageTag: b95ebdd4-da0f-4e30-81ac-3a7032cdd173
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 0 Paris)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Paris)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: caee3ac9-db0c-4350-a8aa-de29f9021d53
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 1 Taux Reussite %)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Taux Reussite %)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 8db9f9ba-8170-4038-8843-963a910c8f1a
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 3 Profits)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Profits)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 126e0c12-a5f8-410a-af88-7ebfc707ddc8
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 5 Gain Total)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Gain Total)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: d578e16e-4ec3-4f8e-aada-b43b9f4a754f
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 6 Cote Moyenne)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 89669bb2-a6c2-408d-9b50-aefb6407aef5
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 7 Cote Moyenne Gagné)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne Gagné)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 4ff13ce6-5c51-46c0-b851-d020dbef40f2
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 8 Cote Moyenne Perdu)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne Perdu)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 27e488dd-caf6-4ee6-ad58-5860f842f7d5
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 9 Paris % Classique)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Paris % Classique)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: ae435be9-f86f-4bda-aca1-89589d0070c0
+
+	measure '_COULEUR_(Tableau Bookmaker KPI 4 Mise Totale)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Mise Totale)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Bookmaker[Bookmaker]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Hors Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Bookmaker[Type_Bookmaker]) && SELECTEDVALUE(Dim_Bookmaker[Type_Bookmaker]) = "Arjel", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Bookmaker
+		lineageTag: 2db10891-9785-4725-b134-f6b5b4813a1f
+
+	measure '_KPI_(Choix Format)' =
+			
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			RETURN
+			CALCULATE(
+			    SWITCH(
+			        NomKPISel,
+			
+			        "KPI_(Paris)","#,##0",
+			
+			        "KPI_(Taux Reussite %)","0.00 %",
+			
+			        "KPI_(ROI)","0.00 %",
+			
+			        "KPI_(Profits)","#,##0.00 €",
+			
+			        "KPI_(Mise Totale)","#,##0.00 €",
+			
+			        "KPI_(Gain Total)","#,##0.00 €",
+			
+			        "KPI_(Cote Moyenne)", "0.00",
+			
+			        "KPI_(Cote Moyenne Gagné)", "0.00",
+			
+			        "KPI_(Cote Moyenne Perdu)""0.00",
+			
+			        "KPI_(Paris % Classique)", "0.00 %",
+			
+			"#,##0.00 €"
+			    )
+			)
+		displayFolder: KPI
+		lineageTag: 593a365f-b619-4c79-8ace-dfbab6f7bbeb
+
+	measure '_KPI_(Choix Format Num)' =
+			
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			    FORMAT([_KPI_(Choix)], FormatKPISel)
+			
+			RETURN ValeurFormatee
+		displayFolder: KPI
+		lineageTag: 002c81fc-df82-412e-8829-a8109e89b92d
+
+	measure '_SVG_(Down 3 Sports)' = ```
+			
+			-- ---------------------------------------------------------
+			-- 1. CONFIGURATION & RANG
+			-- ---------------------------------------------------------
+			VAR RangDuFlop = SELECTEDVALUE(Dim_Podium[Rang])
+			VAR CouleurFond   = [_COULEUR_(Negatif)]  -- Couleur différente pour le flop
+			VAR CouleurChiffre = "#FFFFFF"
+			VAR CouleurTexte   = "#666666"
+			VAR CouleurKPI    = "#666666"
+			
+			-- Tailles adaptées au format compact
+			VAR TailleCarre   = 22
+			VAR TailleChiffre = "14px"
+			VAR TailleTexte   = "11px"
+			VAR TailleKPI     = "9px"
+			VAR Arrondi       = 4
+			
+			-- Positionnement ajusté avec plus d'espace
+			VAR PosXTexte     = 40  
+			VAR PosYTexte     = 17  
+			VAR HauteurSVG    = 30
+			VAR LargeurSVG    = 130 
+			
+			-- ---------------------------------------------------------
+			-- 2. LOGIQUE : DYNAMISATION DU KPI (ORDRE INVERSE)
+			-- ---------------------------------------------------------
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			-- On crée la table avec bookmaker et sa valeur
+			VAR TableAvecValeurs = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(Fact_BDD, Fact_BDD[Sport]),
+			        "@Valeur", 
+			[_KPI_(Choix)]
+			    )
+			
+			-- On filtre pour garder seulement les bookmakers avec une valeur
+			VAR TableFiltree = FILTER(TableAvecValeurs, NOT(ISBLANK([@Valeur])))
+			
+			-- On ajoute le rang INVERSÉ (ASC au lieu de DESC)
+			VAR TableAvecRang = 
+			    ADDCOLUMNS(
+			        TableFiltree,
+			        "@Rang", RANKX(TableFiltree, [@Valeur], , ASC, DENSE)
+			    )
+			
+			-- On récupère le bookmaker et la valeur correspondant au rang
+			VAR LigneSelectionnee = FILTER(TableAvecRang, [@Rang] = RangDuFlop)
+			
+			VAR NomSport = MAXX(LigneSelectionnee, Fact_BDD[Sport])
+			
+			VAR ValeurKPI = MAXX(LigneSelectionnee, [@Valeur])
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			    FORMAT(ValeurKPI, FormatKPISel)
+			
+			-- ---------------------------------------------------------
+			-- 3. RENDU : CONSTRUCTION DU SVG
+			-- ---------------------------------------------------------
+			VAR CentreCarreX = 5 + (TailleCarre / 2)
+			VAR CentreCarreY = 4 + (TailleCarre / 2)
+			
+			VAR CodeSVG = 
+			    "data:image/svg+xml;utf8," & 
+			    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 " & LargeurSVG & " " & HauteurSVG & "'>" & 
+			        "<rect x='5' y='4' width='" & TailleCarre & "' height='" & TailleCarre & "' rx='" & Arrondi & "' " &
+			        "fill='" & CouleurFond & "' />" & 
+			        "<text x='" & CentreCarreX & "' y='" & CentreCarreY + 1 & "' text-anchor='middle' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:900; font-size:" & TailleChiffre & ";' fill='" & CouleurChiffre & "'>" & 
+			        RangDuFlop & "</text>" & 
+			        "<text x='" & PosXTexte & "' y='" & PosYTexte & "' text-anchor='start' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:700; font-size:" & TailleTexte & ";' fill='" & CouleurTexte & "'>" & 
+			        NomSport & 
+			        "<tspan dx='5' style='font-weight:400; font-size:" & TailleKPI & ";' fill='" & CouleurKPI & "'>" & ValeurFormatee & "</tspan>" &
+			        "</text>" & 
+			    "</svg>"
+			
+			RETURN
+			IF(ISBLANK(NomSport), BLANK(), CodeSVG)
+			```
+		displayFolder: Sport
+		lineageTag: d40b75db-2cbd-4232-b262-846041125671
+		dataCategory: ImageUrl
+
+	measure '_SVG_(Top 3 Sports)' = ```
+			
+			-- ---------------------------------------------------------
+			-- 1. CONFIGURATION & RANG
+			-- ---------------------------------------------------------
+			VAR RangDuFlop = SELECTEDVALUE(Dim_Podium[Rang])
+			VAR CouleurFond   = [_COULEUR_(Positif)]
+			VAR CouleurChiffre = "#FFFFFF"
+			VAR CouleurTexte   = "#666666"
+			VAR CouleurKPI    = "#666666"
+			
+			-- Tailles adaptées au format compact
+			VAR TailleCarre   = 22
+			VAR TailleChiffre = "14px"
+			VAR TailleTexte   = "11px"
+			VAR TailleKPI     = "9px"
+			VAR Arrondi       = 4
+			
+			-- Positionnement ajusté avec plus d'espace
+			VAR PosXTexte     = 40  
+			VAR PosYTexte     = 17  
+			VAR HauteurSVG    = 30
+			VAR LargeurSVG    = 130 
+			
+			-- ---------------------------------------------------------
+			-- 2. LOGIQUE : DYNAMISATION DU KPI (ORDRE INVERSE)
+			-- ---------------------------------------------------------
+			VAR NomKPISel = SELECTEDVALUE('Dim_KPI'[Nom_KPI], "KPI_(Profits)")
+			
+			-- On crée la table avec bookmaker et sa valeur
+			VAR TableAvecValeurs = 
+			    ADDCOLUMNS(
+			        SUMMARIZE(Fact_BDD, Fact_BDD[Sport]),
+			        "@Valeur", 
+			[_KPI_(Choix)]
+			    )
+			
+			-- On filtre pour garder seulement les bookmakers avec une valeur
+			VAR TableFiltree = FILTER(TableAvecValeurs, NOT(ISBLANK([@Valeur])))
+			
+			-- On ajoute le rang INVERSÉ (ASC au lieu de DESC)
+			VAR TableAvecRang = 
+			    ADDCOLUMNS(
+			        TableFiltree,
+			        "@Rang", RANKX(TableFiltree, [@Valeur], , DESC, DENSE)
+			    )
+			
+			-- On récupère le bookmaker et la valeur correspondant au rang
+			VAR LigneSelectionnee = FILTER(TableAvecRang, [@Rang] = RangDuFlop)
+			
+			VAR NomSport = MAXX(LigneSelectionnee, Fact_BDD[Sport])
+			
+			VAR ValeurKPI = MAXX(LigneSelectionnee, [@Valeur])
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			    FORMAT(ValeurKPI, FormatKPISel)
+			
+			-- ---------------------------------------------------------
+			-- 3. RENDU : CONSTRUCTION DU SVG
+			-- ---------------------------------------------------------
+			VAR CentreCarreX = 5 + (TailleCarre / 2)
+			VAR CentreCarreY = 4 + (TailleCarre / 2)
+			
+			VAR CodeSVG = 
+			    "data:image/svg+xml;utf8," & 
+			    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 " & LargeurSVG & " " & HauteurSVG & "'>" & 
+			        "<rect x='5' y='4' width='" & TailleCarre & "' height='" & TailleCarre & "' rx='" & Arrondi & "' " &
+			        "fill='" & CouleurFond & "' />" & 
+			        "<text x='" & CentreCarreX & "' y='" & CentreCarreY + 1 & "' text-anchor='middle' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:900; font-size:" & TailleChiffre & ";' fill='" & CouleurChiffre & "'>" & 
+			        RangDuFlop & "</text>" & 
+			        "<text x='" & PosXTexte & "' y='" & PosYTexte & "' text-anchor='start' dominant-baseline='middle' " & 
+			        "style='font-family:Segoe UI, Arial, sans-serif; font-weight:700; font-size:" & TailleTexte & ";' fill='" & CouleurTexte & "'>" & 
+			        NomSport & 
+			        "<tspan dx='5' style='font-weight:400; font-size:" & TailleKPI & ";' fill='" & CouleurKPI & "'>" & ValeurFormatee & "</tspan>" &
+			        "</text>" & 
+			    "</svg>"
+			
+			RETURN
+			IF(ISBLANK(NomSport), BLANK(), CodeSVG)
+			```
+		displayFolder: Sport
+		lineageTag: e3b6b2a8-ff9f-4c6a-b5aa-9e27c4509575
+		dataCategory: ImageUrl
+
+	measure '_LIBELLE_(Tableau Sport)' =
+			
+			
+			SWITCH(
+			    TRUE(),
+			
+			    ISINSCOPE(Dim_Sport[Sport]), SELECTEDVALUE(Dim_Sport[Sport]),
+			
+			    ISINSCOPE(Dim_Sport[Type_Sport]),SELECTEDVALUE(Dim_Sport[Type_Sport]),
+			
+			    "Total"
+			)
+		displayFolder: Sport
+		lineageTag: d4a94f6f-34b8-4ff3-ac9b-6394df022cee
+
+	measure '_COULEUR_(Tableau Sport KPI 0 Paris)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Paris)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: 9e0cc9ee-7389-4dfe-8468-31e4b93188c5
+
+	measure '_COULEUR_(Tableau Sport KPI 1 Taux Reussite %)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Taux Reussite %)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: ba9ffacd-4d2d-411e-95e5-bb30f94668d5
+
+	measure '_COULEUR_(Tableau Sport KPI 2 ROI)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(ROI)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: 33e0c684-b115-4a57-aae8-0decd17f2567
+
+	measure '_COULEUR_(Tableau Sport KPI 3 Profits)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Profits)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: 47c33f87-cb41-4de4-ac69-b5b359962572
+
+	measure '_COULEUR_(Tableau Sport KPI 4 Mise Totale)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Mise Totale)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: c327dc9d-12b3-4fd8-acba-c56e52cbcf9e
+
+	measure '_COULEUR_(Tableau Sport KPI 5 Gain Total)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Gain Total)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: a78c76d5-1d62-4b5a-b739-3242727a24a8
+
+	measure '_COULEUR_(Tableau Sport KPI 6 Cote Moyenne)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: b90d6384-adab-4b9e-bfd2-7eb77aa78829
+
+	measure '_COULEUR_(Tableau Sport KPI 7 Cote Moyenne Gagné)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne Gagné)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: a8507404-ac2d-40fe-b7ba-a8bbdca122e2
+
+	measure '_COULEUR_(Tableau Sport KPI 8 Cote Moyenne Perdu)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Cote Moyenne Perdu)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: 635eee3f-5264-4961-9e05-cc07079ae532
+
+	measure '_COULEUR_(Tableau Sport KPI 9 Paris % Classique)' = ```
+			
+			
+			-- 1. Identification du KPI sélectionné
+			VAR _KPI_Actuel = SELECTEDVALUE(Dim_KPI[Nom_KPI])
+			VAR _EstROI = (_KPI_Actuel = "KPI_(Paris % Classique)")
+			
+			-- 2. Logique de couleurs pour le ROI (Ta nouvelle palette)
+			VAR PaletteViolet = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI Tableau Fond Cat)],
+			        [_COULEUR_(KPI Tableau Fond Total)]
+			    )
+			
+			-- 3. Logique de couleurs standard (Ton ancienne palette - À AJUSTER)
+			VAR PaletteStandard = 
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			
+			-- 4. Choix de la palette selon le contexte
+			RETURN
+			IF(_EstROI,  PaletteViolet,PaletteStandard)
+			```
+		displayFolder: Sport
+		lineageTag: 8f7a665c-fd8b-42b8-b6a8-dcbc9fd5affb
+
+	measure '_COULEUR_(Tableau Sport Police)' =
+			
+			
+			SWITCH(
+			    TRUE(),
+			
+			    ISINSCOPE(Dim_Sport[Sport]), "",
+			
+			    ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", "blach",
+			
+			    ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", "blach",
+			
+			    "white"
+			)
+		displayFolder: Sport
+		lineageTag: 4426216b-132d-4727-82aa-21ac1174043d
+
+	measure '_COULEUR_(Tableau Sport Fond)' = ```
+			
+			
+			
+			    SWITCH(TRUE(),
+			        ISINSCOPE(Dim_Sport[Sport]), [_COULEUR_(KPI No Tableau Fond Ss Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports de NICHE", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        ISINSCOPE(Dim_Sport[Type_Sport]) && SELECTEDVALUE(Dim_Sport[Type_Sport]) = "Sports MAJEURS", [_COULEUR_(KPI No Tableau Fond Cat)],
+			        [_COULEUR_(KPI No Tableau Fond Total)]
+			    )
+			```
+		displayFolder: Sport
+		lineageTag: 4898835d-9122-4956-835e-c449ddd45549
+
+	measure '_KPI_(Choix SUP EG _5_)' = ```
+			
+			
+			-- Format récupéré depuis la table Dim_KPI
+			VAR FormatKPISel = SELECTEDVALUE(Dim_KPI[Format_KPI], "#,##0.00 €")
+			
+			-- Formatage dynamique de la valeur
+			VAR ValeurFormatee =
+			
+			IF([_KPI_(Paris)]>=5,FORMAT([_KPI_(Choix)], FormatKPISel),BLANK())
+			
+			RETURN ValeurFormatee
+			
+			```
+		displayFolder: KPI
+		lineageTag: 42828c39-7c70-48dd-a32d-308668123543
+
+	measure _LastRefresh = ```
+			
+			
+			VAR IND = SELECTEDVALUE(LastRefresh[DerniereActualisation])
+			
+			
+			RETURN 
+			
+			"MAJ : "&IND
+			```
+		displayFolder: Autres
+		lineageTag: dff197b1-6eec-437b-88aa-84c6e416d774
+
+	measure '_(Logo Linkedin HTML)' = ```
+			
+			
+			// ========== PARAMÈTRES DE TAILLE ==========
+			VAR TailleSVG = 30
+			VAR WrapperSize = TailleSVG * 1.2
+			
+			// ========== PARAMÈTRES DE COULEURS ==========
+			// Couleurs du logo (état normal)
+			VAR CouleurIcone = "#7161EF"           // Couleur du pictogramme "in"
+			VAR CouleurCercleInterieur = "white"   // Couleur du cercle intérieur
+			VAR CouleurContour = "white"           // Couleur du contour extérieur
+			
+			// Couleurs au survol
+			VAR CouleurIconeSurvol = "white"       // Couleur du pictogramme au survol
+			VAR CouleurCercleInterieurSurvol = "transparent"  // Cercle intérieur au survol
+			VAR CouleurContourSurvol = "white"     // Contour au survol
+			
+			// Couleur de fond
+			VAR CouleurFond = "transparent"        // Fond du wrapper
+			
+			VAR CSS =
+			"
+			<style>
+			    html { box-sizing: border-box; font-size: 100%; }
+			
+			    body {
+			        background-position: center center;
+			        background-repeat: no-repeat;
+			        background-attachment: fixed;
+			        background-size: cover;
+			        text-align: center;
+			        font-family: ""Montserrat"", sans-serif;
+			        max-width: 100%;
+			        min-height: " & WrapperSize & "px;
+			        height: auto;
+			        display: flex;
+			        justify-content: center;
+			        align-items: center;
+			        margin: 0;
+			        padding: 0;
+			        letter-spacing: 0.1em;
+			    }
+			
+			    /* ----- Conteneur global ----- */
+			    .wrapper {
+			        display: flex;
+			        justify-content: space-around;
+			        align-items: center;
+			        width: " & WrapperSize & "px;
+			        height: " & WrapperSize & "px;
+			        background-color: " & CouleurFond & ";
+			        transition: all 0.4s ease-out;
+			    }
+			
+			    /* ----- Conteneur des liens sociaux ----- */
+			    .wrapper__links { 
+			        display: flex; 
+			        justify-content: space-between; 
+			        align-items: center; 
+			        width: 70%; 
+			    }
+			
+			    /* ----- Élément principal du lien social ----- */
+			    .social-link .social-svg { 
+			        width: " & TailleSVG & "px; 
+			        height: " & TailleSVG & "px; 
+			    }
+			
+			    /* ======================== COULEURS NORMALES ======================== */
+			
+			    /* Icône centrale (le in de LinkedIn) */
+			    .social-link .social-svg .social-group__icon { 
+			        fill: " & CouleurIcone & "; 
+			        transition: all 0.2s; 
+			    }
+			
+			    /* Cercle intérieur derrière le pictogramme */
+			    .social-link .social-svg .social-group__inner-circle { 
+			        fill: " & CouleurCercleInterieur & "; 
+			        transition: all 0.2s; 
+			    }
+			
+			    /* Grand cercle extérieur (le contour) */
+			    .social-link .social-svg .social-group__outline {
+			        stroke: " & CouleurContour & ";
+			        transform-origin: 50% 50%;
+			        transform: scale(1.1);
+			        transition: all 0.2s;
+			    }
+			
+			    /* ======================== COULEURS AU SURVOL ======================== */
+			
+			    /* Quand on survole : l'icône devient colorée */
+			    .social-link .social-svg:hover .social-group__icon, 
+			    .social-link .social-svg:active .social-group__icon, 
+			    .social-link .social-svg:focus .social-group__icon { 
+			        fill: " & CouleurIconeSurvol & "; 
+			        transition: all 0.45s; 
+			    }
+			
+			    /* Quand on survole : le cercle intérieur devient transparent */
+			    .social-link .social-svg:hover .social-group__inner-circle, 
+			    .social-link .social-svg:active .social-group__inner-circle, 
+			    .social-link .social-svg:focus .social-group__inner-circle { 
+			        fill: " & CouleurCercleInterieurSurvol & "; 
+			        transition: all 0.45s; 
+			    }
+			
+			    /* Quand on survole : le contour garde sa couleur et sa taille */
+			    .social-link .social-svg:hover .social-group__outline, 
+			    .social-link .social-svg:active .social-group__outline, 
+			    .social-link .social-svg:focus .social-group__outline { 
+			        stroke: " & CouleurContourSurvol & "; 
+			        transform: scale(1.1); 
+			        transition: all 0.45s; 
+			    }
+			
+			</style>
+			"
+			
+			VAR HTML_ =
+			CSS
+			& "<html lang='en'>
+			<head>
+			<meta charset='UTF-8' />
+			<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+			<title>Linkedin</title>
+			</head>
+			<body>
+			<div class='wrapper'>
+			    <div class='wrapper__links'>
+			        <a class='social-link social-link--linkedin' href='https://www.linkedin.com/in/quentin-diouet'>
+			            <svg class='social-svg' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg' width='" & TailleSVG & "' height='" & TailleSVG & "'>
+			                <title>linkedin</title>
+			                <g class='social-group' fill='none' fill-rule='evenodd'>
+			                    <circle class='social-group__outline' stroke='" & CouleurContour & "' stroke-width='20' cx='300' cy='300' r='262.5' />
+			                    <circle class='social-group__inner-circle' fill='" & CouleurCercleInterieur & "' cx='300' cy='300' r='252.5' />
+			                    <path class='social-group__icon' 
+			                          d='M278.9308 253.1923h43.5769v20.0539h.5923c6.0923-11.5077 20.9-23.6077 43.0692-23.6077 46.0308 0 54.577 30.2923 54.577 69.723v80.2154h-45.4385v-71.1615
+			                          c0-17.0077-.2539-38.8385-23.6077-38.8385-23.6923 0-27.2462 18.5308-27.2462 37.5693v72.4307h-45.4384l-.0846-146.3846zm-74.1231 
+			                          0h45.523V399.577h-45.523V253.1923zm22.8461-72.7692c14.5539 0 26.4 11.8461 26.4 26.4 
+			                          0 14.5538-11.8461 26.4-26.4 26.4-14.6384 0-26.4-11.8462-26.4-26.4 
+			                          0-14.5539 11.7616-26.4 26.4-26.4z' 
+			                          fill='" & CouleurIcone & "' fill-rule='nonzero'/>
+			                </g>
+			            </svg>
+			        </a>
+			    </div>
+			</div>
+			</body>
+			</html>"
+			
+			RETURN
+			HTML_
+			```
+		displayFolder: Autres
+		lineageTag: 7e043065-b2bd-4312-90e8-10c4099dd4b9
+
+	measure _Auteur = ```
+			
+			
+			VAR IND = "Quentin DIOUET"
+			
+			
+			RETURN 
+			
+			"Auteur : "&IND
+			```
+		displayFolder: Autres
+		lineageTag: cbdec2c4-34e7-48e8-abdb-5effbdf95d5b
+
+	column Column
+		isHidden
+		formatString: 0
+		lineageTag: 6650007d-2ae9-470b-be1b-2711b28f2c8c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Mesure = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 903c7df194c84eb0acbd2ceba6f89c25
+

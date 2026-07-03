@@ -1,0 +1,51 @@
+table 'Paramètre Champ'
+	lineageTag: 484194ca-fe7d-4e83-a24a-7886ccd02561
+
+	column Paramètre
+		lineageTag: b37d0015-5252-495b-b57e-68a81fa028e8
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Paramètre Commande'
+
+		relatedColumnDetails
+			groupByColumn: 'Paramètre Champs'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Paramètre Champs'
+		isHidden
+		lineageTag: d7b48b60-cf67-46f9-86d1-f9a54f529ffd
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Paramètre Commande'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Paramètre Commande'
+		isHidden
+		formatString: 0
+		lineageTag: d3f34509-1693-45f7-ab82-9ed3c9000813
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Paramètre Champ' = calculated
+		mode: import
+		source =
+				{
+				    ("Sport", NAMEOF('Dim_Sport'[Sport]), 0),
+				    ("Type_Sport", NAMEOF('Dim_Sport'[Type_Sport]), 1),
+				    ("Bookmaker", NAMEOF('Dim_Bookmaker'[Bookmaker]), 2),
+				    ("Type_Bookmaker", NAMEOF('Dim_Bookmaker'[Type_Bookmaker]), 3),
+				    ("Boost", NAMEOF('Dim_TypeBet'[Boost]), 4)
+				}
+
+	annotation PBI_Id = 318eeb850a224d89b10970e15803098f
+
