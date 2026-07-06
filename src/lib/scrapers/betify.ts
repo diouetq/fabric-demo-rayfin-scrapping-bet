@@ -236,7 +236,19 @@ async function resolveLabels(
 
   // Standard markets: global descriptions + template interpolation
   const md = marketDescs[marketId];
-  if (!md) return null;
+  // If global market description missing or the name is just a numeric id,
+  // try per-event descriptions as a fallback (helps cycling / F1 markets).
+  const nameLooksNumeric = (n?: string) => !n || n === marketId || /^\d+$/.test(n);
+  if (!md || nameLooksNumeric(md.name)) {
+    const ev = await loadEventDescs(eventId, eventCache);
+    if (ev && ev.markets && ev.markets[marketId]) {
+      const mkt = ev.markets[marketId];
+      const outcomeLabels = mkt.variants[variantKey] || mkt.variants[''] || ev.outcomes || {};
+      return { marketLabel: mkt.name, outcomeLabels, isDynamic: true };
+    }
+    if (!md) return null;
+    // fall through to use md when present but numeric
+  }
 
   const spec = parseSpecifier(variantKey);
   const marketLabel = fillTemplate(md.name, spec, competitors);

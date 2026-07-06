@@ -8,7 +8,7 @@ import {
   getResultatEnCoursId,
   loadDimensions,
 } from '@/lib/dimensions';
-import { getPeriodBounds, isPlaceholderParisDate, toDateISO } from '@/lib/kpi-analytics';
+import { getPeriodBounds, isPlaceholderParisDate, parseDateISO, toDateISO } from '@/lib/kpi-analytics';
 import { effectiveStake, rowProfitNet } from '@/lib/kpi-profit';
 import { formValuesToParisInput, scrapRowToFormValues } from '@/lib/paris-form';
 
@@ -516,6 +516,9 @@ export function buildBankrollTimeline(
   allRows: ParisDisplayRow[],
   filters: KpiFilters,
 ): { date: Date; profit: number }[] {
+  // Filtre uniquement sur les dimensions (bookmaker/sport/type/résultat) : l'historique
+  // complet est nécessaire pour calculer le profit déjà accumulé avant le début de la
+  // période sélectionnée (la courbe doit démarrer sur ce solde, pas repartir à 0).
   const dimFiltered = applyKpiFilters(allRows, {
     ...filters,
     periode: 'all',
@@ -550,16 +553,25 @@ export function buildBankrollTimeline(
   const inRange = settled.filter((r) => r.datePari >= rangeFrom && r.datePari <= rangeTo);
   if (inRange.length === 0 && startCum === 0) return [];
 
-  const timeline: { date: Date; profit: number }[] = [];
-  timeline.push({ date: rangeFrom, profit: startCum });
+  // Agrégation par jour : plusieurs paris le même jour ne doivent produire qu'un seul
+  // point (somme des profits), sinon la courbe zigzague inutilement entre des paris
+  // rapprochés dans le temps au lieu de tracer une évolution lisible jour par jour.
+  const byDay = new Map<string, number>();
+  for (const r of inRange) {
+    const key = toDateISO(r.datePari);
+    byDay.set(key, (byDay.get(key) ?? 0) + rowProfitNet(r));
+  }
+  const days = [...byDay.entries()].sort(([a], [b]) => a.localeCompare(b));
+
+  const timeline: { date: Date; profit: number }[] = [{ date: rangeFrom, profit: startCum }];
 
   let cum = startCum;
-  for (const r of inRange) {
-    cum += rowProfitNet(r);
-    timeline.push({ date: r.datePari, profit: cum });
+  for (const [dayIso, delta] of days) {
+    cum += delta;
+    timeline.push({ date: parseDateISO(dayIso), profit: cum });
   }
 
-  return timeline.length >= 2 ? timeline : timeline.length === 1 ? [...timeline, { ...timeline[0], date: rangeTo }] : timeline;
+  return timeline.length >= 2 ? timeline : [...timeline, { ...timeline[0], date: rangeTo }];
 }
 
 export function filterByPeriod(

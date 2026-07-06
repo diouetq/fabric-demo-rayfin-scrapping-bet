@@ -13,6 +13,7 @@ import {
 import {
   computePeriodProfits,
   formatDateFR,
+  type PeriodProfitPoint,
   type ProfitGranularity,
 } from '@/lib/kpi-analytics';
 import {
@@ -26,7 +27,7 @@ import {
   syncFiltersWithPeriod,
 } from '@/components/kpi/KpiDateSlicer';
 import { cn } from '@/lib/utils';
-import { ChevronDown, ChevronUp, X, TrendingUp, TrendingDown, Target, Wallet, Percent, BarChart3, LineChart, CalendarRange, Trophy, CheckCircle2, XCircle, Clock, type LucideIcon } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, TrendingUp, TrendingDown, Target, Wallet, Percent, BarChart3, LineChart, CalendarRange, Trophy, CheckCircle2, XCircle, Clock, Table2, PieChart, type LucideIcon } from 'lucide-react';
 
 // ─── Formatters ──────────────────────────────────────────────────────────────
 
@@ -204,6 +205,34 @@ function SegmentControl<T extends string>({
             value === opt.value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
           )}
         >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+type PeriodView = 'graph' | 'table';
+
+function ViewToggle({ value, onChange }: { value: PeriodView; onChange: (v: PeriodView) => void }) {
+  const options: { value: PeriodView; label: string; icon: LucideIcon }[] = [
+    { value: 'graph', label: 'Graph', icon: BarChart3 },
+    { value: 'table', label: 'Tableau', icon: Table2 },
+  ];
+  return (
+    <div className="inline-flex rounded-full border border-input bg-muted/40 p-0.5 gap-0.5">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          title={opt.label}
+          className={cn(
+            'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
+            value === opt.value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          <opt.icon className="h-3 w-3" />
           {opt.label}
         </button>
       ))}
@@ -484,6 +513,73 @@ function PeriodBreakdownTable({ rows }: { rows: PeriodBreakdownRow[] }) {
   );
 }
 
+function PeriodProfitTable({ data }: { data: PeriodProfitPoint[] }) {
+  if (data.length === 0) {
+    return <p className="py-6 text-center text-xs text-muted-foreground">Aucun profit sur cette période</p>;
+  }
+  return (
+    <div className="max-h-[260px] overflow-y-auto overflow-x-auto rounded-xl border border-border/80">
+      <table className="w-full border-collapse text-[11px] [&_td]:align-middle [&_th]:align-middle">
+        <thead className="sticky top-0 bg-primary text-primary-foreground">
+          <tr>
+            {['Période', 'Du', 'Au', 'Profit net'].map((h) => (
+              <th key={h} className="whitespace-nowrap px-2 py-1.5 text-center font-semibold">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {[...data].reverse().map((d, i) => (
+            <tr key={d.key} className={cn('border-t border-border hover:bg-muted/30', i % 2 === 0 && 'bg-muted/5')}>
+              <td className="whitespace-nowrap px-2 py-1 text-center font-medium">{d.label}</td>
+              <td className="whitespace-nowrap px-2 py-1 text-center tabular-nums text-muted-foreground">{formatDateFR(d.dateFrom)}</td>
+              <td className="whitespace-nowrap px-2 py-1 text-center tabular-nums text-muted-foreground">{formatDateFR(d.dateTo)}</td>
+              <td className={cn('px-2 py-1 text-center tabular-nums font-semibold', d.profit > 0 ? 'text-emerald-600' : d.profit < 0 ? 'text-red-600' : '')}>
+                {signedFmtEur(d.profit)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ProfitByTypeBars({ rows }: { rows: BreakdownRow[] }) {
+  if (rows.length === 0) {
+    return <p className="py-6 text-center text-xs text-muted-foreground">Aucune donnée</p>;
+  }
+  const sorted = [...rows].sort((a, b) => b.profitNet - a.profitNet);
+  const maxAbs = Math.max(...sorted.map((r) => Math.abs(r.profitNet)), 1);
+  const totalAbs = sorted.reduce((s, r) => s + Math.abs(r.profitNet), 0) || 1;
+
+  return (
+    <div className="space-y-2.5 p-1">
+      {sorted.map((r) => {
+        const widthPct = (Math.abs(r.profitNet) / maxAbs) * 100;
+        const sharePct = (Math.abs(r.profitNet) / totalAbs) * 100;
+        const positive = r.profitNet >= 0;
+        return (
+          <div key={r.label} className="flex items-center gap-2">
+            <span className="w-24 shrink-0 truncate text-[11px] font-medium" title={r.label}>{r.label}</span>
+            <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-muted/40">
+              <div
+                className={cn('h-full rounded-md transition-all', positive ? 'bg-emerald-500/70' : 'bg-red-500/70')}
+                style={{ width: `${Math.max(widthPct, 2)}%` }}
+              />
+            </div>
+            <span className={cn('w-16 shrink-0 text-right text-[11px] font-semibold tabular-nums', positive ? 'text-emerald-600' : 'text-red-600')}>
+              {signedFmtEur(r.profitNet)}
+            </span>
+            <span className="w-12 shrink-0 text-right text-[10px] tabular-nums text-muted-foreground">
+              {sharePct.toFixed(0)}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 function KpiPageSkeleton() {
@@ -513,6 +609,7 @@ export function KpiPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<KpiFilters>(DEFAULT_KPI_FILTERS);
   const [granularity, setGranularity] = useState<ProfitGranularity>('month');
+  const [periodView, setPeriodView] = useState<PeriodView>('graph');
   const [datesReady, setDatesReady] = useState(false);
 
   useEffect(() => {
@@ -654,11 +751,24 @@ export function KpiPage() {
         <ChartCard
           title="Profit par période"
           icon={CalendarRange}
-          headerRight={<GranularitySelect value={granularity} onChange={setGranularity} />}
+          headerRight={
+            <div className="flex flex-wrap items-center gap-2">
+              <GranularitySelect value={granularity} onChange={setGranularity} />
+              <ViewToggle value={periodView} onChange={setPeriodView} />
+            </div>
+          }
         >
-          <PeriodProfitChart data={periodProfits} granularity={granularity} />
+          {periodView === 'graph' ? (
+            <PeriodProfitChart data={periodProfits} granularity={granularity} />
+          ) : (
+            <PeriodProfitTable data={periodProfits} />
+          )}
         </ChartCard>
       </div>
+
+      <ChartCard title="Répartition du profit par type de pari" icon={PieChart}>
+        <ProfitByTypeBars rows={kpis.byTypePari} />
+      </ChartCard>
 
       <CollapsibleSection title="Bilan par période" defaultOpen>
         <div className="p-3">

@@ -7,9 +7,11 @@ import { ScraperPage } from '@/pages/ScraperPage';
 import { AdminFactPage } from '@/pages/AdminFactPage';
 import { KpiPage } from '@/pages/KpiPage';
 import { DataDictionaryButton } from '@/components/DataDictionary';
-import { Trophy, BarChart3, Database, Zap } from 'lucide-react';
+import { Trophy, BarChart3, Database, Zap, Github, Info } from 'lucide-react';
 
 type AppPage = 'scraper' | 'admin' | 'kpi';
+
+const GITHUB_REPO_URL = 'https://github.com/diouetq/fabric-demo-rayfin-scrapping-bet';
 
 function App() {
   const [page, setPage] = useState<AppPage>('scraper');
@@ -72,9 +74,25 @@ function App() {
             ))}
             <span className="mx-0.5 h-4 w-px bg-white/20" />
             <DataDictionaryButton />
+            <span className="mx-0.5 h-4 w-px bg-white/20" />
+            <a
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Voir le code source sur GitHub"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white/80 transition-all hover:bg-white/10 hover:text-white"
+            >
+              <Github className="h-3.5 w-3.5" />
+              GitHub
+            </a>
           </nav>
         </div>
       </header>
+
+      <div className="flex items-center justify-center gap-1 px-3 py-0.5 text-center text-[10px] text-muted-foreground/70">
+        <Info className="h-2.5 w-2.5 shrink-0" />
+        Données fictives générées à des fins de démonstration
+      </div>
 
       <main className="flex-1 px-3 py-3 max-w-[100vw] space-y-3">
         {page === 'scraper' && (

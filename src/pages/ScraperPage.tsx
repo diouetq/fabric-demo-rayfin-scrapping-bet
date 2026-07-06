@@ -50,7 +50,7 @@ import {
 
   persistScrape,
 
-  prunePs3838ForBookmakers,
+  preservePs3838OverridesForActiveRows,
 
   saveOddsHistory,
 
@@ -386,9 +386,13 @@ export function ScraperPage({ sportConfig, onSportConfigChange, sportIdsApi, set
 
 
 
-      setRawRows((prev) => mergeScrapeRows(prev, newRows, scrapedLabels));
+      const mergedRows = mergeScrapeRows(rawRows, newRows, scrapedLabels);
 
-      setCoteMarcheOverrides((prev) => prunePs3838ForBookmakers(prev, scrapedLabels));
+      setRawRows(mergedRows);
+
+      setCoteMarcheOverrides((prev) =>
+        preservePs3838OverridesForActiveRows(prev, mergedRows, scrapedLabels),
+      );
 
 
 

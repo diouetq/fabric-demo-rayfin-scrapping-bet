@@ -28,7 +28,13 @@ export function rowOddsKey(row: {
   competition: string;
   evenement: string;
   competiteur: string;
+  pairKey?: string;
 }): string {
+  // Use pairKey when available but include the competiteur to avoid
+  // collapsing the two outcomes of the same market into one key.
+  if (row.pairKey != null) {
+    return `${row.bookmaker}::pairKey::${row.pairKey}::${row.competiteur}`;
+  }
   return `${row.bookmaker}::${row.competition}::${row.evenement}::${row.competiteur}`;
 }
 
@@ -152,6 +158,23 @@ export function prunePs3838Overrides(
   for (const key of Object.keys(next)) {
     if (key.startsWith(`${removedBookmakerLabel}::`)) delete next[key];
   }
+  return next;
+}
+
+export function preservePs3838OverridesForActiveRows(
+  overrides: Record<string, number | null>,
+  activeRows: Array<{ bookmaker: string; competition: string; evenement: string; competiteur: string }>,
+  replacedBookmakerLabels: string[],
+): Record<string, number | null> {
+  const activeKeys = new Set(activeRows.map((row) => rowOddsKey(row)));
+  const next = { ...overrides };
+
+  for (const key of Object.keys(next)) {
+    const [label] = key.split('::');
+    if (!replacedBookmakerLabels.includes(label)) continue;
+    if (!activeKeys.has(key)) delete next[key];
+  }
+
   return next;
 }
 

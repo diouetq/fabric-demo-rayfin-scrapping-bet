@@ -4,6 +4,8 @@ import {
     BarChart3,
     Database,
     ExternalLink,
+    Github,
+    Info,
     Linkedin,
     Loader2,
     Mail,
@@ -15,6 +17,7 @@ import { useAuth } from "@/hooks/auth.context";
 const CONTACT_EMAIL = "diouet.pro@gmail.com";
 const LINKEDIN_URL = "https://www.linkedin.com/in/quentin-diouet/";
 const PORTFOLIO_URL = "https://diouetq.github.io/portfolio/";
+const GITHUB_REPO_URL = "https://github.com/diouetq/fabric-demo-rayfin-scrapping-bet";
 
 function buildFabricPortalAppUrl(): string | null {
     const portal = import.meta.env.VITE_FABRIC_PORTAL_URL?.replace(/\/$/, "");
@@ -137,6 +140,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
                                 </p>
                             </div>
 
+                            <div className="flex items-start gap-2 rounded-xl bg-white/10 px-3.5 py-2.5 ring-1 ring-white/10">
+                                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/80" />
+                                <p className="text-[11px] leading-snug text-white/80">
+                                    Les données affichées (cotes, paris, KPI) sont fictives et générées uniquement à des fins de démonstration.
+                                </p>
+                            </div>
+
                             <div className="space-y-3">
                                 <p className="text-[11px] font-bold uppercase tracking-widest text-white/60">
                                     Ce que vous retrouverez
@@ -239,6 +249,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
                             <span className="text-border">·</span>
                             <a href={PORTFOLIO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-foreground hover:underline">
                                 <ExternalLink className="h-3 w-3" /> Portfolio
+                            </a>
+                            <span className="text-border">·</span>
+                            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-foreground hover:underline">
+                                <Github className="h-3 w-3" /> Code source
                             </a>
                         </footer>
                     </div>

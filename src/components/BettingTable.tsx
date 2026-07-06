@@ -317,7 +317,12 @@ export function BettingTable({
                 <div className="whitespace-normal break-words">{row.evenement}</div>
               </td>,
               <td key="comp" className="text-center align-middle leading-tight" style={{ padding: cellPad }}>
-                <div className="whitespace-normal break-words">{row.competiteur}</div>
+                <div
+                  className="whitespace-normal break-words"
+                  title={`pairKey: ${row.pairKey ?? ''} | marche: ${row.marche ?? ''}`}
+                >
+                  {row.competiteur}
+                </div>
               </td>,
               <td key="coteBm" className="text-center align-middle" style={{ padding: cellPad }}>
                 <OddsBmCell change={oddsChanges[key]} fallbackCote={row.cote} />

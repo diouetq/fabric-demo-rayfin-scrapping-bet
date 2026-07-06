@@ -93,12 +93,15 @@ export function BankrollChart({ data }: { data: { date: Date; profit: number }[]
   const ph = H - PAD.t - PAD.b;
 
   const profits = data.map((d) => d.profit);
-  const rawMin = Math.min(...profits, 0);
-  const rawMax = Math.max(...profits, 0);
+  // Échelle resserrée sur les valeurs réelles (pas de 0 forcé) : les variations restent
+  // lisibles même quand le solde de départ (baseline du slicer) est élevé.
+  const rawMin = Math.min(...profits);
+  const rawMax = Math.max(...profits);
   const yTicks = niceTicks(rawMin, rawMax, 6);
   const minP = yTicks[0];
   const maxP = yTicks[yTicks.length - 1];
   const pRange = maxP - minP || 1;
+  const zeroInRange = minP <= 0 && 0 <= maxP;
 
   const minT = data[0].date.getTime();
   const maxT = data[data.length - 1].date.getTime();
@@ -106,7 +109,7 @@ export function BankrollChart({ data }: { data: { date: Date; profit: number }[]
 
   const sx = (t: number) => PAD.l + ((t - minT) / tRange) * pw;
   const sy = (p: number) => PAD.t + ph - ((p - minP) / pRange) * ph;
-  const zeroY = sy(0);
+  const floorY = PAD.t + ph;
 
   const last = data[data.length - 1].profit;
   const positive = last >= 0;
@@ -116,9 +119,9 @@ export function BankrollChart({ data }: { data: { date: Date; profit: number }[]
   const linePath = smoothLinePath(pts);
 
   const areaPath = [
-    `M${pts[0][0].toFixed(2)},${zeroY.toFixed(2)}`,
+    `M${pts[0][0].toFixed(2)},${floorY.toFixed(2)}`,
     ...pts.slice(1).map(([x, y]) => `L${x.toFixed(2)},${y.toFixed(2)}`),
-    `L${pts[pts.length - 1][0].toFixed(2)},${zeroY.toFixed(2)}`,
+    `L${pts[pts.length - 1][0].toFixed(2)},${floorY.toFixed(2)}`,
     'Z',
   ].join(' ');
 
@@ -176,9 +179,8 @@ export function BankrollChart({ data }: { data: { date: Date; profit: number }[]
                 y2={y}
                 stroke="currentColor"
                 className="text-border"
-                strokeWidth={v === 0 ? 1.25 : 0.75}
-                strokeOpacity={v === 0 ? 0.55 : 0.28}
-                strokeDasharray={v === 0 ? '5 4' : undefined}
+                strokeWidth={0.75}
+                strokeOpacity={0.28}
               />
               <text
                 x={PAD.l - 8}
@@ -193,6 +195,20 @@ export function BankrollChart({ data }: { data: { date: Date; profit: number }[]
             </g>
           );
         })}
+
+        {zeroInRange && (
+          <line
+            x1={PAD.l}
+            y1={sy(0)}
+            x2={W - PAD.r}
+            y2={sy(0)}
+            stroke="currentColor"
+            className="text-border"
+            strokeWidth={1.25}
+            strokeOpacity={0.55}
+            strokeDasharray="5 4"
+          />
+        )}
 
         <path d={areaPath} fill="url(#bankroll-fill)" />
         <path d={linePath} fill="none" stroke={stroke} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
